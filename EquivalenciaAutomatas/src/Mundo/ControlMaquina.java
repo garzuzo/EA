@@ -31,7 +31,7 @@ public class ControlMaquina {
 	}
 
 	public void imprimirComprobante() {
-
+if(!tipoMealy) {
 		for (String key : hmEstadosMoore.keySet()) {
 
 			EstadoMoore act = hmEstadosMoore.get(key);
@@ -39,7 +39,16 @@ public class ControlMaquina {
 			System.out.println(msg);
 
 		}
+}else
+{
+	for (String key : hmEstadosMealy.keySet()) {
 
+		EstadoMealy act = hmEstadosMealy.get(key);
+		String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " " + act.respuesta1+" "+act.respuesta2;
+		System.out.println(msg);
+}
+
+	}
 	}
 
 	//se verifican los inalcanzables, si no lo son se eliminan
