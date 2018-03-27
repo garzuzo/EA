@@ -9,19 +9,31 @@ import javax.swing.*;
 public class PanelMealy extends JPanel {
 
 	private ArrayList<JTextField> estadosM1;
-	private ArrayList<JTextField> estimulosM1;
+	private ArrayList<JTextField> respM1;
 	private ArrayList<JTextField> SigEstadoM1;
 
 	private ArrayList<JTextField> estadosM2;
-	private ArrayList<JTextField> estimulosM2;
+	private ArrayList<JTextField> respM2;
 	private ArrayList<JTextField> SigEstadoM2;
+
+	private JTextField estimulo1;
+
+	public JTextField getEstimulo1() {
+		return estimulo1;
+	}
+
+	public JTextField getEstimulo2() {
+		return estimulo2;
+	}
+
+	private JTextField estimulo2;
 
 	public ArrayList<JTextField> getEstadosM1() {
 		return estadosM1;
 	}
 
-	public ArrayList<JTextField> getEstimulosM1() {
-		return estimulosM1;
+	public ArrayList<JTextField> getRespM1() {
+		return respM1;
 	}
 
 	public ArrayList<JTextField> getSigEstadoM1() {
@@ -32,8 +44,8 @@ public class PanelMealy extends JPanel {
 		return estadosM2;
 	}
 
-	public ArrayList<JTextField> getEstimulosM2() {
-		return estimulosM2;
+	public ArrayList<JTextField> getRespM2() {
+		return respM2;
 	}
 
 	public ArrayList<JTextField> getSigEstadoM2() {
@@ -47,10 +59,10 @@ public class PanelMealy extends JPanel {
 		int numRows = tamM1 + tamM2 + 2;
 
 		estadosM1 = new ArrayList<JTextField>();
-		estimulosM1 = new ArrayList<JTextField>();
+		respM1 = new ArrayList<JTextField>();
 		SigEstadoM1 = new ArrayList<JTextField>();
 		estadosM2 = new ArrayList<JTextField>();
-		estimulosM2 = new ArrayList<JTextField>();
+		respM2 = new ArrayList<JTextField>();
 		SigEstadoM2 = new ArrayList<JTextField>();
 		setLayout(new BorderLayout());
 
@@ -110,7 +122,7 @@ public class PanelMealy extends JPanel {
 			allM1.add(new JLabel(","));
 
 			JTextField estimuloAct1 = new JTextField(tamField);
-			estimulosM1.add(estimuloAct1);
+			respM1.add(estimuloAct1);
 			allM1.add(estimuloAct1);
 
 			allM1.add(new JLabel(")"));
@@ -123,8 +135,9 @@ public class PanelMealy extends JPanel {
 
 			allM1.add(new JLabel(","));
 
+			// respuesta 2 de estado actual
 			JTextField estimuloAct2 = new JTextField(tamField);
-			estimulosM1.add(estimuloAct2);
+			respM1.add(estimuloAct2);
 			allM1.add(estimuloAct2);
 
 			allM1.add(new JLabel(")"));
@@ -148,18 +161,19 @@ public class PanelMealy extends JPanel {
 		allM2.add(new JLabel(""));
 		allM2.add(new JLabel(""));
 
-		JTextField lStim12 = new JTextField(tamField);
-		lStim12.setToolTipText("Agregar estimulo");
-		allM2.add(lStim12);
+		estimulo1 = new JTextField(tamField);
+		estimulo1.setToolTipText("Agregar estimulo");
+		allM2.add(estimulo1);
 
 		allM2.add(new JLabel(""));
 		allM2.add(new JLabel(""));
 		allM2.add(new JLabel(""));
 		allM2.add(new JLabel(""));
 
-		JTextField lStim22 = new JTextField(tamField);
-		lStim22.setToolTipText("Agregar estimulo");
-		allM2.add(lStim22);
+		estimulo2 = new JTextField(tamField);
+		estimulo2.setToolTipText("Agregar estimulo");
+		allM2.add(estimulo2);
+
 		allM2.add(new JLabel(""));
 		allM2.add(new JLabel(""));
 		panelM2.add(allM2, BorderLayout.CENTER);
@@ -177,7 +191,7 @@ public class PanelMealy extends JPanel {
 			allM2.add(new JLabel(","));
 
 			JTextField estimuloAct2 = new JTextField(tamField);
-			estimulosM2.add(estimuloAct2);
+			respM2.add(estimuloAct2);
 			allM2.add(estimuloAct2);
 
 			allM2.add(new JLabel(")"));
@@ -191,7 +205,7 @@ public class PanelMealy extends JPanel {
 			allM2.add(new JLabel(","));
 
 			JTextField estimuloAct4 = new JTextField(tamField);
-			estimulosM2.add(estimuloAct4);
+			respM2.add(estimuloAct4);
 			allM2.add(estimuloAct4);
 
 			allM2.add(new JLabel(")"));

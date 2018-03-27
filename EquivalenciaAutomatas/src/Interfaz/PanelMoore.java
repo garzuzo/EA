@@ -11,21 +11,32 @@ import java.util.*;
 
 public class PanelMoore extends JPanel {
 
-	
 	ArrayList<JTextField> estadosM1;
-	ArrayList<JTextField> estimulosM1;
+	ArrayList<JTextField> respM1;
 	ArrayList<JTextField> SigEstadoM1;
 
 	ArrayList<JTextField> estadosM2;
-	ArrayList<JTextField> estimulosM2;
+	ArrayList<JTextField> respM2;
 	ArrayList<JTextField> SigEstadoM2;
-	
+
+	private JTextField estimulo1;
+
+	private JTextField estimulo2;
+
+	public JTextField getEstimulo1() {
+		return estimulo1;
+	}
+
+	public JTextField getEstimulo2() {
+		return estimulo2;
+	}
+
 	public ArrayList<JTextField> getEstadosM1() {
 		return estadosM1;
 	}
 
-	public ArrayList<JTextField> getEstimulosM1() {
-		return estimulosM1;
+	public ArrayList<JTextField> getRespM1() {
+		return respM1;
 	}
 
 	public ArrayList<JTextField> getSigEstadoM1() {
@@ -36,15 +47,13 @@ public class PanelMoore extends JPanel {
 		return estadosM2;
 	}
 
-	public ArrayList<JTextField> getEstimulosM2() {
-		return estimulosM2;
+	public ArrayList<JTextField> getRespM2() {
+		return respM2;
 	}
 
 	public ArrayList<JTextField> getSigEstadoM2() {
 		return SigEstadoM2;
 	}
-
-
 
 	int tamField = 2;
 
@@ -53,10 +62,10 @@ public class PanelMoore extends JPanel {
 		int numRows = tamM1 + tamM2 + 2;
 
 		estadosM1 = new ArrayList<JTextField>();
-		estimulosM1 = new ArrayList<JTextField>();
+		respM1 = new ArrayList<JTextField>();
 		SigEstadoM1 = new ArrayList<JTextField>();
 		estadosM2 = new ArrayList<JTextField>();
-		estimulosM2 = new ArrayList<JTextField>();
+		respM2 = new ArrayList<JTextField>();
 		SigEstadoM2 = new ArrayList<JTextField>();
 		setLayout(new BorderLayout());
 
@@ -85,13 +94,13 @@ public class PanelMoore extends JPanel {
 		JLabel lEstado = new JLabel("E");
 		allM1.add(lEstado);
 
-		JTextField lStim1 = new JTextField(tamField);
-		lStim1.setToolTipText("Agregar estimulo");
-		allM1.add(lStim1);
+		estimulo1= new JTextField(tamField);
+		estimulo1.setToolTipText("Agregar estimulo");
+		allM1.add(estimulo1);
 
-		JTextField lStim2 = new JTextField(tamField);
-		lStim2.setToolTipText("Agregar estimulo");
-		allM1.add(lStim2);
+		estimulo2= new JTextField(tamField);
+		estimulo2.setToolTipText("Agregar estimulo");
+		allM1.add(estimulo2);
 
 		allM1.add(new JLabel("R"));
 
@@ -99,24 +108,18 @@ public class PanelMoore extends JPanel {
 			JTextField estadoAct = new JTextField(tamField);
 			estadosM1.add(estadoAct);
 			allM1.add(estadoAct);
-			
 
 			JTextField SigEstadoM11 = new JTextField(tamField);
 			SigEstadoM1.add(SigEstadoM11);
 			allM1.add(SigEstadoM11);
 
-		
-
 			JTextField SigEstadoM12 = new JTextField(tamField);
 			SigEstadoM1.add(SigEstadoM12);
 			allM1.add(SigEstadoM12);
 
-			
-
 			JTextField estimuloAct = new JTextField(tamField);
-			estimulosM1.add(estimuloAct);
+			respM1.add(estimuloAct);
 			allM1.add(estimuloAct);
-
 
 		}
 
@@ -134,13 +137,9 @@ public class PanelMoore extends JPanel {
 		JLabel lEstado2 = new JLabel("E");
 		allM2.add(lEstado2);
 
-	
-
 		JTextField lStim12 = new JTextField(tamField);
 		lStim12.setToolTipText("Agregar estimulo");
 		allM2.add(lStim12);
-
-		
 
 		JTextField lStim22 = new JTextField(tamField);
 		lStim22.setToolTipText("Agregar estimulo");
@@ -153,22 +152,17 @@ public class PanelMoore extends JPanel {
 			JTextField estadoAct = new JTextField(tamField);
 			estadosM2.add(estadoAct);
 			allM2.add(estadoAct);
-			
 
 			JTextField SigEstadoM11 = new JTextField(tamField);
 			SigEstadoM2.add(SigEstadoM11);
 			allM2.add(SigEstadoM11);
 
-		
-
 			JTextField SigEstadoM12 = new JTextField(tamField);
 			SigEstadoM2.add(SigEstadoM12);
 			allM2.add(SigEstadoM12);
 
-			
-
 			JTextField estimuloAct = new JTextField(tamField);
-			estimulosM2.add(estimuloAct);
+			respM2.add(estimuloAct);
 			allM2.add(estimuloAct);
 
 		}

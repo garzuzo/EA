@@ -20,12 +20,15 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 	private ControlMaquina controlMaquina;
 	private ArrayList<JTextField> estadosM1;
-	private ArrayList<JTextField> estimulosM1;
+	private ArrayList<JTextField> respM1;
 	private ArrayList<JTextField> SigEstadoM1;
 
 	private ArrayList<JTextField> estadosM2;
-	private ArrayList<JTextField> estimulosM2;
+	private ArrayList<JTextField> respM2;
 	private ArrayList<JTextField> SigEstadoM2;
+
+	private String estimulo1;
+	private String estimulo2;
 
 	private int numEstadosM1;
 	private int numEstadosM2;
@@ -127,10 +130,19 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 		} else if (comando.equals(resolver)) {
 
-			controlMaquina = new ControlMaquina(rbMealy.isSelected());
+			boolean esMealy=rbMealy.isSelected();
+			if(esMealy) {
+		estimulo1=panelMealy.getEstimulo1().getText();
+		estimulo2=panelMealy.getEstimulo2().getText();		
+			}else {
+				
+				estimulo1=panelMoore.getEstimulo1().getText();
+				estimulo2=panelMoore.getEstimulo2().getText();	
+			}
+			controlMaquina = new ControlMaquina(esMealy,estimulo1,estimulo2);
 
-			controlMaquina.crearMaquina1(estadosM1, estimulosM1, SigEstadoM1);
-			controlMaquina.crearMaquina2(estadosM2, estimulosM2, SigEstadoM2);
+			controlMaquina.crearMaquina1(estadosM1, respM1, SigEstadoM1);
+			controlMaquina.crearMaquina2(estadosM2, respM2, SigEstadoM2);
 
 		}
 
@@ -145,10 +157,10 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		panelMealy = new PanelMealy(numEstadosM1, numEstadosM2);
 		add(panelMealy, BorderLayout.CENTER);
 		estadosM1 = panelMealy.getEstadosM1();
-		estimulosM1 = panelMealy.getEstimulosM1();
+		respM1 = panelMealy.getRespM1();
 		SigEstadoM1 = panelMealy.getSigEstadoM1();
 		estadosM2 = panelMealy.getEstadosM2();
-		estimulosM2 = panelMealy.getEstimulosM2();
+		respM2 = panelMealy.getRespM2();
 		SigEstadoM2 = panelMealy.getSigEstadoM2();
 	}
 
@@ -161,10 +173,10 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		panelMoore = new PanelMoore(numEstadosM1, numEstadosM2);
 		add(panelMoore, BorderLayout.CENTER);
 		estadosM1 = panelMoore.getEstadosM1();
-		estimulosM1 = panelMoore.getEstimulosM1();
+		respM1 = panelMoore.getRespM1();
 		SigEstadoM1 = panelMoore.getSigEstadoM1();
 		estadosM2 = panelMoore.getEstadosM2();
-		estimulosM2 = panelMoore.getEstimulosM2();
+		respM2 = panelMoore.getRespM2();
 		SigEstadoM2 = panelMoore.getSigEstadoM2();
 	}
 
