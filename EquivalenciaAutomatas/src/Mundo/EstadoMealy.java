@@ -20,5 +20,8 @@ public class EstadoMealy {
 		this.respuesta2 = respuesta2;
 	}
 	
+	public EstadoMealy(String estado) {
+		this.estado=estado;
+	}
 
 }
