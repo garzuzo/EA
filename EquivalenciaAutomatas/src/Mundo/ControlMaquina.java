@@ -42,6 +42,7 @@ public class ControlMaquina {
 
 	}
 
+	//se verifican los inalcanzables, si no lo son se eliminan
 	public void verificarAlcanzables() {
 
 		if (tipoMealy) {
@@ -66,7 +67,7 @@ public class ControlMaquina {
 			}
 
 			for (int i = 0; i < inalcanzables.size(); i++) {
-				hmEstadosMealy.remove(inalcanzables.get(i));
+				hmEstadosMoore.remove(inalcanzables.get(i));
 			}
 		}
 
