@@ -29,7 +29,7 @@ public class ControlMaquina {
 //		}
 
 		if (tipoMealy) {
-			for (int i = 0; i < respM1.size(); i += 2) {
+			for (int i=0,j=0; i < respM1.size(); i += 2,j++) {
 				
 				String resp1 = respM1.get(i).getText();
 				String resp2 = respM1.get(i + 1).getText();
@@ -50,9 +50,9 @@ public class ControlMaquina {
 					
 				}
 					
-				
-				EstadoMealy eMAct=new EstadoMealy(estimulo1, next1, resp1, estimulo2, next2, resp2);
-				estadosM1.put("A", eMAct);
+				String nomEstado=statesM1.get(j).getText();
+				EstadoMealy eMAct=new EstadoMealy(nomEstado,estimulo1, next1, resp1, estimulo2, next2, resp2);
+				estadosM1.put(nomEstado, eMAct);
 			}
 			
 
