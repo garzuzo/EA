@@ -9,6 +9,8 @@ public class EstadoMealy {
 	String estimulo2;
 	EstadoMealy sigEstado2;
 	String respuesta2;
+	//verifica si se puede acceder mediante el estado inicial
+	boolean alcanzable;
 	public EstadoMealy(String estado,String estimulo1, EstadoMealy sigEstado1, String respuesta1, String estimulo2,
 			EstadoMealy sigEstado2, String respuesta2) {
 		this.estado=estado;

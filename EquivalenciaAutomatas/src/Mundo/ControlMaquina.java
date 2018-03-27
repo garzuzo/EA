@@ -15,6 +15,7 @@ public class ControlMaquina {
 	// En el momento de hacer la suma de m1 y m2 sirve para verificar que no se vaya
 	// a repetir nombres
 	HashSet<String> estadosM1;
+	HashSet<String> estadosM2;
 
 	String estimulo1;
 	String estimulo2;
@@ -23,9 +24,52 @@ public class ControlMaquina {
 		this.tipoMealy = tipoMealy;
 		this.estimulo1 = estimulo1;
 		this.estimulo2 = estimulo2;
-		estadosM1=new HashSet<String>();
-		hmEstadosMealy=new HashMap<String,EstadoMealy>();
-		hmEstadosMoore=new HashMap<String,EstadoMoore>();
+		estadosM1 = new HashSet<String>();
+		estadosM2 = new HashSet<String>();
+		hmEstadosMealy = new HashMap<String, EstadoMealy>();
+		hmEstadosMoore = new HashMap<String, EstadoMoore>();
+	}
+
+	public void imprimirComprobante() {
+
+		for (String key : hmEstadosMoore.keySet()) {
+
+			EstadoMoore act = hmEstadosMoore.get(key);
+			String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " " + act.respuesta;
+			System.out.println(msg);
+
+		}
+
+	}
+
+	public void verificarAlcanzables() {
+
+		if (tipoMealy) {
+			ArrayList<String> inalcanzables = new ArrayList<String>();
+			for (String key : hmEstadosMealy.keySet()) {
+
+				EstadoMealy act = hmEstadosMealy.get(key);
+				if (!act.alcanzable)
+					inalcanzables.add(key);
+			}
+
+			for (int i = 0; i < inalcanzables.size(); i++) {
+				hmEstadosMealy.remove(inalcanzables.get(i));
+			}
+		} else {
+			ArrayList<String> inalcanzables = new ArrayList<String>();
+			for (String key : hmEstadosMoore.keySet()) {
+
+				EstadoMoore act = hmEstadosMoore.get(key);
+				if (!act.alcanzable)
+					inalcanzables.add(key);
+			}
+
+			for (int i = 0; i < inalcanzables.size(); i++) {
+				hmEstadosMealy.remove(inalcanzables.get(i));
+			}
+		}
+
 	}
 
 	public void crearMaquina1(ArrayList<JTextField> statesM1, ArrayList<JTextField> respM1,
@@ -69,8 +113,27 @@ public class ControlMaquina {
 					eMAct.respuesta2 = resp2;
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
+					if (i == 0)
+						eMAct.alcanzable = true;
+
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
+
 				} else {
 					EstadoMealy eMAct = new EstadoMealy(nomEstado, estimulo1, next1, resp1, estimulo2, next2, resp2);
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
+
 					hmEstadosMealy.put(nomEstado, eMAct);
 				}
 			}
@@ -107,9 +170,25 @@ public class ControlMaquina {
 
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
 				} else {
 
 					EstadoMoore eMAct = new EstadoMoore(nomEstado, estimulo1, next1, estimulo2, next2, resp);
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
 					hmEstadosMoore.put(nomEstado, eMAct);
 				}
 
@@ -161,6 +240,7 @@ public class ControlMaquina {
 				if (estadosM1.contains(nomEstado))
 					nomEstado += nomEstado;
 
+				estadosM2.add(nomEstado);
 				if (hmEstadosMealy.containsKey(nomEstado)) {
 					EstadoMealy eMAct = hmEstadosMealy.get(nomEstado);
 					eMAct.estimulo1 = estimulo1;
@@ -169,8 +249,24 @@ public class ControlMaquina {
 					eMAct.respuesta2 = resp2;
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
 				} else {
 					EstadoMealy eMAct = new EstadoMealy(nomEstado, estimulo1, next1, resp1, estimulo2, next2, resp2);
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
 					hmEstadosMealy.put(nomEstado, eMAct);
 				}
 			}
@@ -180,8 +276,6 @@ public class ControlMaquina {
 				// PASO 1: verifico si tiene el mismo nombre de un estado de M1
 				if (estadosM1.contains(nomEstado))
 					nomEstado += nomEstado;
-
-				estadosM1.add(nomEstado);
 
 				String sgnte1 = SigEstadoM2.get(i).getText();
 				// PASO 1: verifico si tiene el mismo nombre de un estado de M1
@@ -219,9 +313,25 @@ public class ControlMaquina {
 
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
 				} else {
 
 					EstadoMoore eMAct = new EstadoMoore(nomEstado, estimulo1, next1, estimulo2, next2, resp);
+					if (i == 0)
+						eMAct.alcanzable = true;
+					// si el estado actual es alcanzable, los que conecta son alcanzables
+					if (eMAct.alcanzable) {
+						next1.alcanzable = true;
+						next2.alcanzable = true;
+
+					}
 					hmEstadosMoore.put(nomEstado, eMAct);
 				}
 

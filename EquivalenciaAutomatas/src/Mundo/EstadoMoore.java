@@ -20,7 +20,8 @@ public class EstadoMoore {
 	String estimulo2;
 	EstadoMoore sigEstado2;
 	String respuesta;
-
+	//verifica si se puede acceder mediante el estado inicial
+boolean alcanzable;
 	public EstadoMoore(String estado) {
 		this.estado = estado;
 	}

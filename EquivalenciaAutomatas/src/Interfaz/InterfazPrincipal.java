@@ -143,7 +143,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 			controlMaquina.crearMaquina1(estadosM1, respM1, SigEstadoM1);
 			controlMaquina.crearMaquina2(estadosM2, respM2, SigEstadoM2);
-
+controlMaquina.imprimirComprobante();
 		}
 
 	}
