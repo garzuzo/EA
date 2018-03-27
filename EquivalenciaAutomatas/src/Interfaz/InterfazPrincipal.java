@@ -1,32 +1,101 @@
 package Interfaz;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
+import Mundo.ControlMaquina;
 import Mundo.Estado;
 
-public class InterfazPrincipal extends JFrame {
+/**
+ * 
+ * @author garzuzo
+ *
+ */
+public class InterfazPrincipal extends JFrame implements ActionListener {
+
+	private ControlMaquina controlMaquina;
+	private ArrayList<JTextField> estadosM1;
+	private ArrayList<JTextField> estimulosM1;
+	private ArrayList<JTextField> SigEstadoM1;
+
+	private ArrayList<JTextField> estadosM2;
+	private ArrayList<JTextField> estimulosM2;
+	private ArrayList<JTextField> SigEstadoM2;
 
 	private int numEstadosM1;
 	private int numEstadosM2;
 	private ArrayList<Estado> m1;
 	private ArrayList<Estado> m2;
-	JButton bSelecMaquina;
+
+	public static final String selectTipoM = "tipoM";
+	public static final String resolver = "res";
+	public static final String aceptar = "aceptar";
+	JRadioButton rbMealy;
+	JRadioButton rbMoore;
+
+	PanelMealy panelMealy;
+	PanelMoore panelMoore;
+
+	JTextField tTamM1;
+	JTextField tTamM2;
+	JButton bAceptar;
+	JButton bResolver;
+
 	public InterfazPrincipal() {
+
+		setLayout(new BorderLayout());
+		JPanel panelIncludeAll = new JPanel();
+		panelIncludeAll.setLayout(new BorderLayout());
+
+		JPanel pAceptar = new JPanel();
+		pAceptar.setLayout(new FlowLayout());
+		bAceptar = new JButton("Aceptar");
+
+		bAceptar.addActionListener(this);
+		bAceptar.setActionCommand(aceptar);
+		pAceptar.add(bAceptar);
+		JPanel panelOpciones = new JPanel();
+		panelOpciones.setLayout(new FlowLayout());
 
 		JLabel sel = new JLabel("Selecciona el tipo de Maquina de estado");
 
-		this.add(sel);
+		panelOpciones.add(sel);
 
-		JRadioButton rbMealy = new JRadioButton("Mealy");
-		JRadioButton rbMoore = new JRadioButton("Moore");
-		JRadioButtonMenuItem rbGroup = new JRadioButtonMenuItem();
+		rbMealy = new JRadioButton("Mealy");
+		rbMoore = new JRadioButton("Moore");
+		ButtonGroup rbGroup = new ButtonGroup();
 		rbGroup.add(rbMealy);
 		rbGroup.add(rbMoore);
-		 bSelecMaquina = new JButton("Seleccionar");
+		rbMealy.setSelected(true);
+		panelOpciones.add(rbMealy);
+		panelOpciones.add(rbMoore);
+		JPanel panelTam = new JPanel();
 
+		panelTam.setLayout(new FlowLayout());
+		panelTam.add(new JLabel("Numero de estados M1:"));
+
+		tTamM1 = new JTextField(3);
+		panelTam.add(tTamM1);
+		panelTam.add(new JLabel("Numero de estados M1:"));
+		tTamM2 = new JTextField(3);
+		panelTam.add(tTamM2);
+
+		panelIncludeAll.add(panelOpciones, BorderLayout.NORTH);
+		panelIncludeAll.add(panelTam, BorderLayout.CENTER);
+		panelIncludeAll.add(pAceptar, BorderLayout.SOUTH);
+		add(panelIncludeAll, BorderLayout.NORTH);
+		JPanel bRes = new JPanel();
+		bRes.setLayout(new FlowLayout());
+		bResolver = new JButton("Resolver");
+		bResolver.addActionListener(this);
+		bResolver.setActionCommand(resolver);
+		bRes.add(bResolver);
+		add(bRes, BorderLayout.SOUTH);
 	}
 
 	public static void main(String[] args) {
@@ -34,7 +103,69 @@ public class InterfazPrincipal extends JFrame {
 
 		InterfazPrincipal ip = new InterfazPrincipal();
 		ip.setVisible(true);
+		ip.setSize(1000, 700);
 		ip.setLocationRelativeTo(null);
+		ip.setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+
+		String comando = ae.getActionCommand();
+
+		if (comando.equals(aceptar)) {
+
+			numEstadosM1 = Integer.parseInt(tTamM1.getText());
+			numEstadosM2 = Integer.parseInt(tTamM2.getText());
+			if (rbMealy.isSelected()) {
+				tipoMealy();
+			} else {
+				tipoMoore();
+			}
+			this.pack();
+			this.revalidate();
+
+		} else if (comando.equals(resolver)) {
+
+			controlMaquina = new ControlMaquina(rbMealy.isSelected());
+
+			controlMaquina.crearMaquina1(estadosM1, estimulosM1, SigEstadoM1);
+			controlMaquina.crearMaquina2(estadosM2, estimulosM2, SigEstadoM2);
+
+		}
+
+	}
+
+	public void tipoMealy() {
+		if (panelMealy != null)
+			remove(panelMealy);
+		if (panelMoore != null)
+			remove(panelMoore);
+
+		panelMealy = new PanelMealy(numEstadosM1, numEstadosM2);
+		add(panelMealy, BorderLayout.CENTER);
+		estadosM1 = panelMealy.getEstadosM1();
+		estimulosM1 = panelMealy.getEstimulosM1();
+		SigEstadoM1 = panelMealy.getSigEstadoM1();
+		estadosM2 = panelMealy.getEstadosM2();
+		estimulosM2 = panelMealy.getEstimulosM2();
+		SigEstadoM2 = panelMealy.getSigEstadoM2();
+	}
+
+	public void tipoMoore() {
+		if (panelMoore != null)
+			remove(panelMoore);
+		if (panelMealy != null)
+			remove(panelMealy);
+
+		panelMoore = new PanelMoore(numEstadosM1, numEstadosM2);
+		add(panelMoore, BorderLayout.CENTER);
+		estadosM1 = panelMoore.getEstadosM1();
+		estimulosM1 = panelMoore.getEstimulosM1();
+		SigEstadoM1 = panelMoore.getSigEstadoM1();
+		estadosM2 = panelMoore.getEstadosM2();
+		estimulosM2 = panelMoore.getEstimulosM2();
+		SigEstadoM2 = panelMoore.getSigEstadoM2();
 	}
 
 }
