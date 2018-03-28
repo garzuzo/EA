@@ -5,12 +5,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
+/**
+ * 
+ * @author garzuzo
+ *
+ */
 public class ControlMaquina {
 
+	
+	
 	boolean tipoMealy;
+	/**
+	 * Almacenamiento de estados mealy como suma de ambas maquinas m1 y m2
+	 */
 	HashMap<String, EstadoMealy> hmEstadosMealy;
+	/**
+	 * Almacenamiento de estados moore como suma de ambas maquinas m1 y m2
+	 */
 	HashMap<String, EstadoMoore> hmEstadosMoore;
 
 	// En el momento de hacer la suma de m1 y m2 sirve para verificar que no se vaya
@@ -18,14 +31,25 @@ public class ControlMaquina {
 	HashSet<String> estadosM1;
 	HashSet<String> estadosM2;
 
+	
 	String estimulo1;
 	String estimulo2;
+	
 	String estadoInicialM1;
 	String estadoInicialM2;
 
 	// RESPUESTAS DE LOS AUTOMATAS
 	HashSet<String> respuestas;
 
+	/**
+	 * 
+	 * Constructor de la clase
+	 * 
+	 * @param tipoMealy
+	 *            si es true es porque es una maquina tipo mealy
+	 * @param estimulo1
+	 * @param estimulo2
+	 */
 	public ControlMaquina(boolean tipoMealy, String estimulo1, String estimulo2) {
 		this.tipoMealy = tipoMealy;
 		this.estimulo1 = estimulo1;
@@ -38,14 +62,33 @@ public class ControlMaquina {
 	}
 
 	ArrayList<HashSet<String>> pAnterior;
+	// llegara hasta el Pfinal
 	ArrayList<HashSet<String>> pActual;
 
+	public String conjuntoFinal() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < pActual.size(); i++) {
+
+			sb.append("{");
+			for (String k : pActual.get(i)) {
+				sb.append(k + ",");
+			}
+			sb.append("},");
+
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Verifica que dos automates (mealy o moore) son equivalentes
+	 * 
+	 * @return true si m1 y m2 son equivalentes
+	 */
 	public boolean automatasEquivalentes() {
 
 		Iterator<String> it = respuestas.iterator();
 		String resp1 = it.next();
 		String resp2 = it.next();
-		boolean equivalentes = false;
 
 		if (tipoMealy) {
 
@@ -54,21 +97,17 @@ public class ControlMaquina {
 			HashSet<String> hsEstim12 = new HashSet<String>();
 			HashSet<String> hsEstim21 = new HashSet<String>();
 			HashSet<String> hsEstim22 = new HashSet<String>();
-			pAnterior.add(hsEstim11);
-			pAnterior.add(hsEstim12);
-			pAnterior.add(hsEstim21);
-			pAnterior.add(hsEstim22);
 
 			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
 			for (String key : hmEstadosMealy.keySet()) {
 
 				EstadoMealy act = hmEstadosMealy.get(key);
 
-				if (act.respuesta1.equals(resp1) && act.respuesta1.equals(resp1)) {
+				if (act.respuesta1.equals(resp1) && act.respuesta2.equals(resp1)) {
 					hsEstim11.add(key);
 				} else if (act.respuesta1.equals(resp1) && act.respuesta2.equals(resp2)) {
 					hsEstim12.add(key);
-				} else if (act.respuesta2.equals(resp2) && act.respuesta1.equals(resp1)) {
+				} else if (act.respuesta1.equals(resp2) && act.respuesta2.equals(resp1)) {
 					hsEstim21.add(key);
 				} else {
 					hsEstim22.add(key);
@@ -76,70 +115,92 @@ public class ControlMaquina {
 				}
 
 			}
+			if (!hsEstim11.isEmpty())
+				pAnterior.add(hsEstim11);
+			if (!hsEstim12.isEmpty())
+				pAnterior.add(hsEstim12);
+			if (!hsEstim21.isEmpty())
+				pAnterior.add(hsEstim21);
+			if (!hsEstim22.isEmpty())
+				pAnterior.add(hsEstim22);
+
+			// clone pActual al empezar p1
+			pActual = new ArrayList<HashSet<String>>();
 			for (int i = 0; i < pAnterior.size(); i++) {
-				if (pAnterior.get(i).size() == 0)
-					pAnterior.remove(i);
+				HashSet<String> act = new HashSet<String>();
+				for (String k : pAnterior.get(i)) {
+					act.add(k);
+				}
+				pActual.add(act);
 			}
 
-			pActual = (ArrayList<HashSet<String>>) pAnterior.clone();
-
 			while (true) {
-				HashSet<String> act = new HashSet<String>();
-				pActual.add(act);
 
 				for (int i = 0; i < pActual.size(); i++) {
+					HashSet<String> act = new HashSet<String>();
+					pActual.add(act);
+
 					Iterator<String> itConjAct = pActual.get(i).iterator();
 					// elemento al cual le voy a comparar todo el conjunto
-					if(itConjAct.hasNext()) {
-					String firstElement = itConjAct.next();
-					EstadoMoore e1 = hmEstadosMoore.get(firstElement);
-					String e1Sig1 = e1.sigEstado1.estado;
-					String e1Sig2 = e1.sigEstado2.estado;
-					while (itConjAct.hasNext()) {
+					if (itConjAct.hasNext()) {
+						String firstElement = itConjAct.next();
+						EstadoMealy e1 = hmEstadosMealy.get(firstElement);
+						String e1Sig1 = e1.sigEstado1.estado;
+						String e1Sig2 = e1.sigEstado2.estado;
+						while (itConjAct.hasNext()) {
 
-						EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
-						if (!e2.estado.equals(firstElement)) {
-							String e2Sig1 = e2.sigEstado1.estado;
-							String e2Sig2 = e2.sigEstado2.estado;
+							EstadoMealy e2 = hmEstadosMealy.get(itConjAct.next());
+							if (!e2.estado.equals(firstElement)) {
+								String e2Sig1 = e2.sigEstado1.estado;
+								String e2Sig2 = e2.sigEstado2.estado;
 
-							boolean noCumple = false;
-							for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
+								boolean noCumple = false;
+								for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
-								if (pAnterior.get(j).contains(e1Sig1))
-									if (!pAnterior.get(j).contains(e2Sig1))
-										noCumple = true;
+									if (pAnterior.get(j).contains(e1Sig1))
+										if (!pAnterior.get(j).contains(e2Sig1))
+											noCumple = true;
 
-								if (pAnterior.get(j).contains(e1Sig2))
-									if (!pAnterior.get(j).contains(e2Sig2))
-										noCumple = true;
-							}
+									if (pAnterior.get(j).contains(e1Sig2))
+										if (!pAnterior.get(j).contains(e2Sig2))
+											noCumple = true;
+								}
 
-							// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
-							if (noCumple) {
+								// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
+								if (noCumple) {
 
-								act.add(e2.estado);
-								pActual.get(i).remove(e2.estado);
+									act.add(e2.estado);
+									pActual.get(i).remove(e2.estado);
 
-								itConjAct = pActual.get(i).iterator();
+									itConjAct = pActual.get(i).iterator();
 
+								}
 							}
 						}
 					}
-				}}
-				if (act.isEmpty())
-					pActual.remove(act);
+					if (act.isEmpty())
+						pActual.remove(act);
+				}
+
 				// verifica si el subconjunto anterior es igual al subconjunto actual, para
 				// terminar el algoritmo
 				if (pActual.size() == pAnterior.size())
 					break;
 
-				pAnterior = (ArrayList<HashSet<String>>) pActual.clone();
+				// clone actualiza el pAnterior
+				pAnterior = new ArrayList<HashSet<String>>();
+				for (int i = 0; i < pActual.size(); i++) {
+					HashSet<String> hsAct = new HashSet<String>();
+					for (String k : pActual.get(i)) {
+						hsAct.add(k);
+					}
+					pAnterior.add(hsAct);
+				}
 
 			}
 
-			boolean noCumple = false;
 			boolean estadosInicialesJuntos = false;
-			boolean alMenosUnoDeAmbos = false;
+
 			for (int i = 0; i < pActual.size(); i++) {
 
 				HashSet<String> hsAct = pActual.get(i);
@@ -174,8 +235,7 @@ public class ControlMaquina {
 			pAnterior = new ArrayList<HashSet<String>>();
 			HashSet<String> hsEstim1 = new HashSet<String>();
 			HashSet<String> hsEstim2 = new HashSet<String>();
-			pAnterior.add(hsEstim1);
-			pAnterior.add(hsEstim2);
+
 			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
 			for (String key : hmEstadosMoore.keySet()) {
 
@@ -187,70 +247,89 @@ public class ControlMaquina {
 					hsEstim2.add(key);
 				}
 			}
+
+			// agrego solo los conjuntos que no estan vacios a p1
+			if (!hsEstim1.isEmpty())
+				pAnterior.add(hsEstim1);
+			if (!hsEstim2.isEmpty())
+				pAnterior.add(hsEstim2);
+			// clone pActual al empezar p1
+			pActual = new ArrayList<HashSet<String>>();
 			for (int i = 0; i < pAnterior.size(); i++) {
-				if (pAnterior.get(i).size() == 0) {
-					pAnterior.remove(i);
+				HashSet<String> act = new HashSet<String>();
+				for (String k : pAnterior.get(i)) {
+					act.add(k);
 				}
+				pActual.add(act);
 			}
-			pActual = (ArrayList<HashSet<String>>) pAnterior.clone();
 
 			while (true) {
-				HashSet<String> act = new HashSet<String>();
-				pActual.add(act);
 
 				for (int i = 0; i < pActual.size(); i++) {
+					HashSet<String> act = new HashSet<String>();
+					pActual.add(act);
 					Iterator<String> itConjAct = pActual.get(i).iterator();
 					// elemento al cual le voy a comparar todo el conjunto
-					if(itConjAct.hasNext()) {
-					String firstElement = itConjAct.next();
-					EstadoMoore e1 = hmEstadosMoore.get(firstElement);
-					String e1Sig1 = e1.sigEstado1.estado;
-					String e1Sig2 = e1.sigEstado2.estado;
-					while (itConjAct.hasNext()) {
+					if (itConjAct.hasNext()) {
+						String firstElement = itConjAct.next();
+						EstadoMoore e1 = hmEstadosMoore.get(firstElement);
+						String e1Sig1 = e1.sigEstado1.estado;
+						String e1Sig2 = e1.sigEstado2.estado;
+						while (itConjAct.hasNext()) {
 
-						EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
-						if (!e2.estado.equals(firstElement)) {
-							String e2Sig1 = e2.sigEstado1.estado;
-							String e2Sig2 = e2.sigEstado2.estado;
+							EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
+							if (!e2.estado.equals(firstElement)) {
+								String e2Sig1 = e2.sigEstado1.estado;
+								String e2Sig2 = e2.sigEstado2.estado;
 
-							boolean noCumple = false;
-							for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
+								boolean noCumple = false;
+								for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
-								if (pAnterior.get(j).contains(e1Sig1))
-									if (!pAnterior.get(j).contains(e2Sig1))
-										noCumple = true;
+									if (pAnterior.get(j).contains(e1Sig1))
+										if (!pAnterior.get(j).contains(e2Sig1))
+											noCumple = true;
 
-								if (pAnterior.get(j).contains(e1Sig2))
-									if (!pAnterior.get(j).contains(e2Sig2))
-										noCumple = true;
-							}
+									if (pAnterior.get(j).contains(e1Sig2))
+										if (!pAnterior.get(j).contains(e2Sig2))
+											noCumple = true;
+								}
 
-							// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
-							if (noCumple) {
+								// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
+								if (noCumple) {
 
-								act.add(e2.estado);
-								pActual.get(i).remove(e2.estado);
+									act.add(e2.estado);
+									pActual.get(i).remove(e2.estado);
 
-								itConjAct = pActual.get(i).iterator();
+									itConjAct = pActual.get(i).iterator();
 
+								}
 							}
 						}
 					}
-				}}
-				if (act.isEmpty())
-					pActual.remove(act);
+					// si el conjunto que cree no es usado se elimina
+					if (act.isEmpty())
+						pActual.remove(act);
+				}
+
 				// verifica si el subconjunto anterior es igual al subconjunto actual, para
 				// terminar el algoritmo
 				if (pActual.size() == pAnterior.size())
 					break;
 
-				pAnterior = (ArrayList<HashSet<String>>) pActual.clone();
+				// clone actualiza el pAnterior
+				pAnterior = new ArrayList<HashSet<String>>();
+				for (int i = 0; i < pActual.size(); i++) {
+					HashSet<String> hsAct = new HashSet<String>();
+					for (String k : pActual.get(i)) {
+						hsAct.add(k);
+					}
+					pAnterior.add(hsAct);
+				}
 
 			}
 
-			boolean noCumple = false;
 			boolean estadosInicialesJuntos = false;
-			boolean alMenosUnoDeAmbos = false;
+
 			for (int i = 0; i < pActual.size(); i++) {
 
 				HashSet<String> hsAct = pActual.get(i);
@@ -282,7 +361,6 @@ public class ControlMaquina {
 			if (!estadosInicialesJuntos)
 				return false;
 		}
-
 		return true;
 	}
 
@@ -311,7 +389,10 @@ public class ControlMaquina {
 		}
 	}
 
-	// se verifican los inalcanzables, si no lo son se eliminan
+	/**
+	 * 
+	 * se verifican los estados inalcanzables, los cuales se deben eliminar
+	 */
 	public void verificarAlcanzables() {
 
 		if (tipoMealy) {
@@ -342,6 +423,16 @@ public class ControlMaquina {
 
 	}
 
+	/**
+	 * 
+	 * @param statesM1
+	 *            campos de texto con los estados de m1
+	 * @param respM1
+	 *            campos de texto con las respuestas de m1 respectivas a cada estado
+	 * @param SigEstadoM1
+	 *            campos de texto con los estados siguientes respectivos a cada
+	 *            estado de m1
+	 */
 	public void crearMaquina1(ArrayList<JTextField> statesM1, ArrayList<JTextField> respM1,
 			ArrayList<JTextField> SigEstadoM1) {
 
@@ -478,6 +569,16 @@ public class ControlMaquina {
 
 	}
 
+	/**
+	 * 
+	 * @param statesM2
+	 *            campos de texto con los estados de m2
+	 * @param respM2
+	 *            campos de texto con las respuestas de m2 respectivas a cada estado
+	 * @param SigEstadoM2
+	 *            campos de texto con los estados siguientes respectivos a cada
+	 *            estado de m2
+	 */
 	public void crearMaquina2(ArrayList<JTextField> statesM2, ArrayList<JTextField> respM2,
 			ArrayList<JTextField> SigEstadoM2) {
 

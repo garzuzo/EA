@@ -62,7 +62,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		JPanel panelOpciones = new JPanel();
 		panelOpciones.setLayout(new FlowLayout());
 
-		JLabel sel = new JLabel("Selecciona el tipo de Maquina de estado");
+		JLabel sel = new JLabel("Selecciona el tipo de Maquina de estados");
 
 		panelOpciones.add(sel);
 
@@ -81,7 +81,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 		tTamM1 = new JTextField(3);
 		panelTam.add(tTamM1);
-		panelTam.add(new JLabel("Numero de estados M1:"));
+		panelTam.add(new JLabel("Numero de estados M2:"));
 		tTamM2 = new JTextField(3);
 		panelTam.add(tTamM2);
 
@@ -141,10 +141,13 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 			controlMaquina.crearMaquina1(estadosM1, respM1, SigEstadoM1);
 			controlMaquina.crearMaquina2(estadosM2, respM2, SigEstadoM2);
 			controlMaquina.verificarAlcanzables();
-			controlMaquina.imprimirComprobante();
+			// controlMaquina.imprimirComprobante();
 			boolean equivalentes = controlMaquina.automatasEquivalentes();
 			String msg = "Automatas M1 y M2 son ";
-			JOptionPane.showMessageDialog(null, equivalentes ? msg + "equivalentes" : msg + "no equivalentes");
+			String conjuntoFinal = controlMaquina.conjuntoFinal();
+			JOptionPane.showMessageDialog(null,
+					equivalentes ? msg + "equivalentes\n" + conjuntoFinal : msg + "NO equivalentes\n" + conjuntoFinal);
+
 		}
 
 	}
