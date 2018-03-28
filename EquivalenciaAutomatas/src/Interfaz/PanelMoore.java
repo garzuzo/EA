@@ -2,7 +2,7 @@ package Interfaz;
 
 import javax.swing.*;
 
-import Mundo.Estado;
+
 
 import java.awt.BorderLayout;
 import java.awt.Color;

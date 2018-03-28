@@ -9,7 +9,7 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
 import Mundo.ControlMaquina;
-import Mundo.Estado;
+
 
 /**
  * 
@@ -32,8 +32,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 	private int numEstadosM1;
 	private int numEstadosM2;
-	private ArrayList<Estado> m1;
-	private ArrayList<Estado> m2;
+	
 
 	public static final String selectTipoM = "tipoM";
 	public static final String resolver = "res";

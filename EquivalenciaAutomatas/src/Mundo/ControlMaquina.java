@@ -3,6 +3,7 @@ package Mundo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.swing.JTextField;
 
@@ -19,6 +20,10 @@ public class ControlMaquina {
 
 	String estimulo1;
 	String estimulo2;
+	String estadoInicialM1;
+	String estadoInicialM2;
+
+	HashSet<String> respuestas;
 
 	public ControlMaquina(boolean tipoMealy, String estimulo1, String estimulo2) {
 		this.tipoMealy = tipoMealy;
@@ -30,28 +35,142 @@ public class ControlMaquina {
 		hmEstadosMoore = new HashMap<String, EstadoMoore>();
 	}
 
-	public void imprimirComprobante() {
-if(!tipoMealy) {
-		for (String key : hmEstadosMoore.keySet()) {
+	ArrayList<HashSet<String>> pAnterior;
+	ArrayList<HashSet<String>> pActual;
 
-			EstadoMoore act = hmEstadosMoore.get(key);
-			String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " " + act.respuesta;
-			System.out.println(msg);
+	public boolean automatasEquivalentes() {
+
+		Iterator<String> it = respuestas.iterator();
+		String resp1 = it.next();
+		String resp2 = it.next();
+		boolean equivalentes = false;
+
+		if (tipoMealy) {
+
+			pAnterior = new ArrayList<HashSet<String>>();
+			HashSet<String> hsEstim11 = new HashSet<String>();
+			HashSet<String> hsEstim12 = new HashSet<String>();
+			HashSet<String> hsEstim21 = new HashSet<String>();
+			HashSet<String> hsEstim22 = new HashSet<String>();
+			pAnterior.add(hsEstim11);
+			pAnterior.add(hsEstim12);
+			pAnterior.add(hsEstim21);
+			pAnterior.add(hsEstim22);
+
+			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
+			for (String key : hmEstadosMealy.keySet()) {
+
+				EstadoMealy act = hmEstadosMealy.get(key);
+
+				if (act.respuesta1.equals(resp1) && act.respuesta1.equals(resp1)) {
+					hsEstim11.add(key);
+				} else if (act.respuesta1.equals(resp1) && act.respuesta2.equals(resp2)) {
+					hsEstim12.add(key);
+				} else if (act.respuesta2.equals(resp2) && act.respuesta1.equals(resp1)) {
+					hsEstim21.add(key);
+				} else {
+					hsEstim22.add(key);
+
+				}
+
+			}
+			for (int i = 0; i < pAnterior.size(); i++) {
+				if (pAnterior.get(i).size() == 0)
+					pAnterior.remove(i);
+			}
+
+			pActual = (ArrayList<HashSet<String>>) pAnterior.clone();
+		} else {
+			pAnterior = new ArrayList<HashSet<String>>();
+			HashSet<String> hsEstim1 = new HashSet<String>();
+			HashSet<String> hsEstim2 = new HashSet<String>();
+			pAnterior.add(hsEstim1);
+			pAnterior.add(hsEstim2);
+			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
+			for (String key : hmEstadosMoore.keySet()) {
+
+				EstadoMoore act = hmEstadosMoore.get(key);
+				if (act.respuesta.equals(resp1)) {
+
+					hsEstim1.add(key);
+				} else {
+					hsEstim2.add(key);
+				}
+			}
+			for (int i = 0; i < pAnterior.size(); i++) {
+				if (pAnterior.get(i).size() == 0) {
+					pAnterior.remove(i);
+				}
+			}
+			pActual = (ArrayList<HashSet<String>>) pAnterior.clone();
+
+			while (true) {
+
+				for (int i = 0; i < pActual.size(); i++) {
+					HashSet<String> conjuntoAct = pActual.get(i);
+					for (String key : conjuntoAct) {
+						EstadoMoore e1 = hmEstadosMoore.get(key);
+						EstadoMoore e2 = hmEstadosMoore.get(key);
+						String e1Sig1 = e1.sigEstado1.estado;
+						String e1Sig2 = e1.sigEstado2.estado;
+
+						String e2Sig1 = e2.sigEstado1.estado;
+						String e2Sig2 = e2.sigEstado2.estado;
+
+						boolean noCumple = false;
+						for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
+
+							if (pAnterior.get(i).contains(e1Sig1))
+								if (!pAnterior.get(i).contains(e2Sig1))
+									noCumple = true;
+
+							if (pAnterior.get(i).contains(e1Sig2))
+								if (!pAnterior.get(i).contains(e2Sig2))
+									noCumple = true;
+						}
+
+						//si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
+						if (noCumple) {
+							HashSet<String> act = new HashSet<String>();
+							act.add(e2.estado);
+							conjuntoAct.remove(e2.estado);
+							pActual.add(act);
+						}
+					}
+				}
+
+			}
+		}
+
+		return equivalentes;
+	}
+
+	/**
+	 * Comprueba que se han eliminado los estados inaccesibles
+	 */
+	public void imprimirComprobante() {
+		if (!tipoMealy) {
+			for (String key : hmEstadosMoore.keySet()) {
+
+				EstadoMoore act = hmEstadosMoore.get(key);
+				String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " "
+						+ act.respuesta;
+				System.out.println(msg);
+
+			}
+		} else {
+			for (String key : hmEstadosMealy.keySet()) {
+
+				EstadoMealy act = hmEstadosMealy.get(key);
+				String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " "
+						+ act.respuesta1 + " " + act.respuesta2;
+				System.out.println(msg);
+			}
 
 		}
-}else
-{
-	for (String key : hmEstadosMealy.keySet()) {
-
-		EstadoMealy act = hmEstadosMealy.get(key);
-		String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " " + act.respuesta1+" "+act.respuesta2;
-		System.out.println(msg);
-}
-
-	}
 	}
 
-	//se verifican los inalcanzables, si no lo son se eliminan
+	// se verifican los inalcanzables, si no lo son se eliminan
 	public void verificarAlcanzables() {
 
 		if (tipoMealy) {
@@ -123,9 +242,11 @@ if(!tipoMealy) {
 					eMAct.respuesta2 = resp2;
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
-					if (i == 0)
-						eMAct.alcanzable = true;
 
+					if (i == 0) {
+						eMAct.alcanzable = true;
+						estadoInicialM1 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -135,8 +256,10 @@ if(!tipoMealy) {
 
 				} else {
 					EstadoMealy eMAct = new EstadoMealy(nomEstado, estimulo1, next1, resp1, estimulo2, next2, resp2);
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM1 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -146,6 +269,8 @@ if(!tipoMealy) {
 
 					hmEstadosMealy.put(nomEstado, eMAct);
 				}
+				respuestas.add(resp1);
+				respuestas.add(resp2);
 			}
 
 		} else {
@@ -180,8 +305,10 @@ if(!tipoMealy) {
 
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM1 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -191,8 +318,10 @@ if(!tipoMealy) {
 				} else {
 
 					EstadoMoore eMAct = new EstadoMoore(nomEstado, estimulo1, next1, estimulo2, next2, resp);
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM1 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -201,6 +330,7 @@ if(!tipoMealy) {
 					}
 					hmEstadosMoore.put(nomEstado, eMAct);
 				}
+				respuestas.add(resp);
 
 			}
 		}
@@ -259,8 +389,10 @@ if(!tipoMealy) {
 					eMAct.respuesta2 = resp2;
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM2 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -269,8 +401,10 @@ if(!tipoMealy) {
 					}
 				} else {
 					EstadoMealy eMAct = new EstadoMealy(nomEstado, estimulo1, next1, resp1, estimulo2, next2, resp2);
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM2 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -323,8 +457,10 @@ if(!tipoMealy) {
 
 					eMAct.sigEstado1 = next1;
 					eMAct.sigEstado2 = next2;
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM2 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
@@ -334,8 +470,10 @@ if(!tipoMealy) {
 				} else {
 
 					EstadoMoore eMAct = new EstadoMoore(nomEstado, estimulo1, next1, estimulo2, next2, resp);
-					if (i == 0)
+					if (i == 0) {
 						eMAct.alcanzable = true;
+						estadoInicialM2 = nomEstado;
+					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
 						next1.alcanzable = true;
