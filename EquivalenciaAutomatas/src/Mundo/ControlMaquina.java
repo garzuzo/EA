@@ -23,6 +23,7 @@ public class ControlMaquina {
 	String estadoInicialM1;
 	String estadoInicialM2;
 
+	// RESPUESTAS DE LOS AUTOMATAS
 	HashSet<String> respuestas;
 
 	public ControlMaquina(boolean tipoMealy, String estimulo1, String estimulo2) {
@@ -33,6 +34,7 @@ public class ControlMaquina {
 		estadosM2 = new HashSet<String>();
 		hmEstadosMealy = new HashMap<String, EstadoMealy>();
 		hmEstadosMoore = new HashMap<String, EstadoMoore>();
+		respuestas = new HashSet<String>();
 	}
 
 	ArrayList<HashSet<String>> pAnterior;
@@ -80,6 +82,94 @@ public class ControlMaquina {
 			}
 
 			pActual = (ArrayList<HashSet<String>>) pAnterior.clone();
+
+			while (true) {
+				HashSet<String> act = new HashSet<String>();
+				pActual.add(act);
+
+				for (int i = 0; i < pActual.size(); i++) {
+					Iterator<String> itConjAct = pActual.get(i).iterator();
+					// elemento al cual le voy a comparar todo el conjunto
+					if(itConjAct.hasNext()) {
+					String firstElement = itConjAct.next();
+					EstadoMoore e1 = hmEstadosMoore.get(firstElement);
+					String e1Sig1 = e1.sigEstado1.estado;
+					String e1Sig2 = e1.sigEstado2.estado;
+					while (itConjAct.hasNext()) {
+
+						EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
+						if (!e2.estado.equals(firstElement)) {
+							String e2Sig1 = e2.sigEstado1.estado;
+							String e2Sig2 = e2.sigEstado2.estado;
+
+							boolean noCumple = false;
+							for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
+
+								if (pAnterior.get(j).contains(e1Sig1))
+									if (!pAnterior.get(j).contains(e2Sig1))
+										noCumple = true;
+
+								if (pAnterior.get(j).contains(e1Sig2))
+									if (!pAnterior.get(j).contains(e2Sig2))
+										noCumple = true;
+							}
+
+							// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
+							if (noCumple) {
+
+								act.add(e2.estado);
+								pActual.get(i).remove(e2.estado);
+
+								itConjAct = pActual.get(i).iterator();
+
+							}
+						}
+					}
+				}}
+				if (act.isEmpty())
+					pActual.remove(act);
+				// verifica si el subconjunto anterior es igual al subconjunto actual, para
+				// terminar el algoritmo
+				if (pActual.size() == pAnterior.size())
+					break;
+
+				pAnterior = (ArrayList<HashSet<String>>) pActual.clone();
+
+			}
+
+			boolean noCumple = false;
+			boolean estadosInicialesJuntos = false;
+			boolean alMenosUnoDeAmbos = false;
+			for (int i = 0; i < pActual.size(); i++) {
+
+				HashSet<String> hsAct = pActual.get(i);
+				boolean elemM1 = false;
+				boolean elemM2 = false;
+				boolean eInicialM1 = false;
+				boolean eInicialM2 = false;
+				for (String k : hsAct) {
+
+					if (estadosM1.contains(k)) {
+						elemM1 = true;
+					} else if (estadosM2.contains(k)) {
+						elemM2 = true;
+					}
+					if (k.equals(estadoInicialM1)) {
+						eInicialM1 = true;
+
+					} else if (k.equals(estadoInicialM2)) {
+						eInicialM2 = true;
+					}
+
+				}
+				if (eInicialM1 && eInicialM2)
+					estadosInicialesJuntos = true;
+				if (!elemM1 || !elemM2)
+					return false;
+
+			}
+			if (!estadosInicialesJuntos)
+				return false;
 		} else {
 			pAnterior = new ArrayList<HashSet<String>>();
 			HashSet<String> hsEstim1 = new HashSet<String>();
@@ -105,9 +195,13 @@ public class ControlMaquina {
 			pActual = (ArrayList<HashSet<String>>) pAnterior.clone();
 
 			while (true) {
+				HashSet<String> act = new HashSet<String>();
+				pActual.add(act);
 
 				for (int i = 0; i < pActual.size(); i++) {
 					Iterator<String> itConjAct = pActual.get(i).iterator();
+					// elemento al cual le voy a comparar todo el conjunto
+					if(itConjAct.hasNext()) {
 					String firstElement = itConjAct.next();
 					EstadoMoore e1 = hmEstadosMoore.get(firstElement);
 					String e1Sig1 = e1.sigEstado1.estado;
@@ -115,40 +209,81 @@ public class ControlMaquina {
 					while (itConjAct.hasNext()) {
 
 						EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
+						if (!e2.estado.equals(firstElement)) {
+							String e2Sig1 = e2.sigEstado1.estado;
+							String e2Sig2 = e2.sigEstado2.estado;
 
-						String e2Sig1 = e2.sigEstado1.estado;
-						String e2Sig2 = e2.sigEstado2.estado;
+							boolean noCumple = false;
+							for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
-						boolean noCumple = false;
-						for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
+								if (pAnterior.get(j).contains(e1Sig1))
+									if (!pAnterior.get(j).contains(e2Sig1))
+										noCumple = true;
 
-							if (pAnterior.get(i).contains(e1Sig1))
-								if (!pAnterior.get(i).contains(e2Sig1))
-									noCumple = true;
+								if (pAnterior.get(j).contains(e1Sig2))
+									if (!pAnterior.get(j).contains(e2Sig2))
+										noCumple = true;
+							}
 
-							if (pAnterior.get(i).contains(e1Sig2))
-								if (!pAnterior.get(i).contains(e2Sig2))
-									noCumple = true;
-						}
+							// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
+							if (noCumple) {
 
-						// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
-						if (noCumple) {
-							HashSet<String> act = new HashSet<String>();
-							act.add(e2.estado);
-							pActual.get(i).remove(e2.estado);
-							pActual.add(act);
+								act.add(e2.estado);
+								pActual.get(i).remove(e2.estado);
+
+								itConjAct = pActual.get(i).iterator();
+
+							}
 						}
 					}
-				}
+				}}
+				if (act.isEmpty())
+					pActual.remove(act);
 				// verifica si el subconjunto anterior es igual al subconjunto actual, para
 				// terminar el algoritmo
 				if (pActual.size() == pAnterior.size())
 					break;
 
+				pAnterior = (ArrayList<HashSet<String>>) pActual.clone();
+
 			}
+
+			boolean noCumple = false;
+			boolean estadosInicialesJuntos = false;
+			boolean alMenosUnoDeAmbos = false;
+			for (int i = 0; i < pActual.size(); i++) {
+
+				HashSet<String> hsAct = pActual.get(i);
+				boolean elemM1 = false;
+				boolean elemM2 = false;
+				boolean eInicialM1 = false;
+				boolean eInicialM2 = false;
+				for (String k : hsAct) {
+
+					if (estadosM1.contains(k)) {
+						elemM1 = true;
+					} else if (estadosM2.contains(k)) {
+						elemM2 = true;
+					}
+					if (k.equals(estadoInicialM1)) {
+						eInicialM1 = true;
+
+					} else if (k.equals(estadoInicialM2)) {
+						eInicialM2 = true;
+					}
+
+				}
+				if (eInicialM1 && eInicialM2)
+					estadosInicialesJuntos = true;
+				if (!elemM1 || !elemM2)
+					return false;
+
+			}
+			if (!estadosInicialesJuntos)
+				return false;
 		}
 
-		return equivalentes;
+		return true;
 	}
 
 	/**
@@ -432,6 +567,7 @@ public class ControlMaquina {
 				if (estadosM1.contains(sgnte1))
 					sgnte1 += sgnte1;
 
+				estadosM2.add(nomEstado);
 				EstadoMoore next1 = null;
 				if (hmEstadosMoore.containsKey(sgnte1)) {
 					next1 = hmEstadosMoore.get(sgnte1);

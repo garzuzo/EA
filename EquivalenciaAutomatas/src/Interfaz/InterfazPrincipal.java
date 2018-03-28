@@ -10,7 +10,6 @@ import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
 
 import Mundo.ControlMaquina;
 
-
 /**
  * 
  * @author garzuzo
@@ -32,7 +31,6 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 	private int numEstadosM1;
 	private int numEstadosM2;
-	
 
 	public static final String selectTipoM = "tipoM";
 	public static final String resolver = "res";
@@ -129,21 +127,24 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 		} else if (comando.equals(resolver)) {
 
-			boolean esMealy=rbMealy.isSelected();
-			if(esMealy) {
-		estimulo1=panelMealy.getEstimulo1().getText();
-		estimulo2=panelMealy.getEstimulo2().getText();		
-			}else {
-				
-				estimulo1=panelMoore.getEstimulo1().getText();
-				estimulo2=panelMoore.getEstimulo2().getText();	
+			boolean esMealy = rbMealy.isSelected();
+			if (esMealy) {
+				estimulo1 = panelMealy.getEstimulo1().getText();
+				estimulo2 = panelMealy.getEstimulo2().getText();
+			} else {
+
+				estimulo1 = panelMoore.getEstimulo1().getText();
+				estimulo2 = panelMoore.getEstimulo2().getText();
 			}
-			controlMaquina = new ControlMaquina(esMealy,estimulo1,estimulo2);
+			controlMaquina = new ControlMaquina(esMealy, estimulo1, estimulo2);
 
 			controlMaquina.crearMaquina1(estadosM1, respM1, SigEstadoM1);
 			controlMaquina.crearMaquina2(estadosM2, respM2, SigEstadoM2);
 			controlMaquina.verificarAlcanzables();
-controlMaquina.imprimirComprobante();
+			controlMaquina.imprimirComprobante();
+			boolean equivalentes = controlMaquina.automatasEquivalentes();
+			String msg = "Automatas M1 y M2 son ";
+			JOptionPane.showMessageDialog(null, equivalentes ? msg + "equivalentes" : msg + "no equivalentes");
 		}
 
 	}
