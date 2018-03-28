@@ -107,12 +107,14 @@ public class ControlMaquina {
 			while (true) {
 
 				for (int i = 0; i < pActual.size(); i++) {
-					HashSet<String> conjuntoAct = pActual.get(i);
-					for (String key : conjuntoAct) {
-						EstadoMoore e1 = hmEstadosMoore.get(key);
-						EstadoMoore e2 = hmEstadosMoore.get(key);
-						String e1Sig1 = e1.sigEstado1.estado;
-						String e1Sig2 = e1.sigEstado2.estado;
+					Iterator<String> itConjAct = pActual.get(i).iterator();
+					String firstElement = itConjAct.next();
+					EstadoMoore e1 = hmEstadosMoore.get(firstElement);
+					String e1Sig1 = e1.sigEstado1.estado;
+					String e1Sig2 = e1.sigEstado2.estado;
+					while (itConjAct.hasNext()) {
+
+						EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
 
 						String e2Sig1 = e2.sigEstado1.estado;
 						String e2Sig2 = e2.sigEstado2.estado;
@@ -129,15 +131,19 @@ public class ControlMaquina {
 									noCumple = true;
 						}
 
-						//si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
+						// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
 						if (noCumple) {
 							HashSet<String> act = new HashSet<String>();
 							act.add(e2.estado);
-							conjuntoAct.remove(e2.estado);
+							pActual.get(i).remove(e2.estado);
 							pActual.add(act);
 						}
 					}
 				}
+				// verifica si el subconjunto anterior es igual al subconjunto actual, para
+				// terminar el algoritmo
+				if (pActual.size() == pAnterior.size())
+					break;
 
 			}
 		}
