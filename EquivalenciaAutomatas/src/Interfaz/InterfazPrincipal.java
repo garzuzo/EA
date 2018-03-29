@@ -46,6 +46,12 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 	JButton bAceptar;
 	JButton bResolver;
 
+	/**
+	 * 
+	 * Constructor del Frame que inicializara los elementos
+	 * que permitiran seleccionar el tipo de maquina y el numero
+	 * de estados que tendra tanto M1 como M2
+	 */
 	public InterfazPrincipal() {
 
 		setLayout(new BorderLayout());
