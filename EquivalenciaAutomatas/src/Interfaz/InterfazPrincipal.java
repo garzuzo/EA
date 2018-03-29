@@ -151,7 +151,10 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		}
 
 	}
-
+/**
+ * Al seleccionar el tipo Mealy y undir el boton Aceptar
+ * se desplegara la tabla para ingresar los datos de M1 y de M2
+ */
 	public void tipoMealy() {
 		if (panelMealy != null)
 			remove(panelMealy);
@@ -167,7 +170,10 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		respM2 = panelMealy.getRespM2();
 		SigEstadoM2 = panelMealy.getSigEstadoM2();
 	}
-
+	/**
+	 * Al seleccionar el tipo Moore y undir el boton Aceptar
+	 * se desplegara la tabla para ingresar los datos de M1 y de M2
+	 */
 	public void tipoMoore() {
 		if (panelMoore != null)
 			remove(panelMoore);
