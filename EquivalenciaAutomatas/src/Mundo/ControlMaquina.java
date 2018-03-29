@@ -65,6 +65,10 @@ public class ControlMaquina {
 	// llegara hasta el Pfinal
 	ArrayList<HashSet<String>> pActual;
 
+	/**
+	 * 
+	 * @return mensaje con el conjunto final (Pf)
+	 */
 	public String conjuntoFinal() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < pActual.size(); i++) {
