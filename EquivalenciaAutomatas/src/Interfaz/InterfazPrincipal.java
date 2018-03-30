@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
@@ -46,6 +47,12 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 	JButton bAceptar;
 	JButton bResolver;
 
+	
+	HashSet<String> estimulos;
+	HashSet<String> respuestas;
+	
+	JTextField tEstimulos;
+	JTextField  tRespuestas;
 	/**
 	 * 
 	 * Constructor del Frame que inicializara los elementos
@@ -93,8 +100,26 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 		panelIncludeAll.add(panelOpciones, BorderLayout.NORTH);
 		panelIncludeAll.add(panelTam, BorderLayout.CENTER);
-		panelIncludeAll.add(pAceptar, BorderLayout.SOUTH);
-		add(panelIncludeAll, BorderLayout.NORTH);
+		
+		JPanel pAlfabetos=new JPanel();
+		pAlfabetos.setLayout(new BorderLayout());
+		pAlfabetos.add(panelIncludeAll,BorderLayout.NORTH);
+		
+		JPanel pEstResp=new JPanel();
+		pEstResp.setLayout(new FlowLayout());
+		tEstimulos=new JTextField(5);
+		tEstimulos.setToolTipText("ej:a,b,c");
+		tRespuestas=new JTextField(5);
+		tRespuestas.setToolTipText("ej:a,b,c");
+		pEstResp.add(new JLabel("Alfabeto Estimulo"));
+		pEstResp.add(tEstimulos);
+		pEstResp.add(new JLabel("Alfabeto Respuesta"));
+		pEstResp.add(tRespuestas);
+		
+		pAlfabetos.add(pEstResp,BorderLayout.CENTER);
+		pAlfabetos.add(pAceptar,BorderLayout.SOUTH);
+	
+		add(pAlfabetos, BorderLayout.NORTH);
 		JPanel bRes = new JPanel();
 		bRes.setLayout(new FlowLayout());
 		bResolver = new JButton("Resolver");
@@ -104,6 +129,23 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		add(bRes, BorderLayout.SOUTH);
 	}
 
+	
+	public void agregarEstimulosRespuestas() {
+		
+		estimulos=new HashSet<String>();
+		respuestas=new HashSet<String>();
+		String[] ests=tEstimulos.getText().split(",");
+		String[] resps=tRespuestas.getText().split(",");
+		
+		for(String esAct:ests) 
+			estimulos.add(esAct);
+		
+		for(String respAct:resps) 
+			respuestas.add(respAct);
+		
+		
+		
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
@@ -123,6 +165,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 			numEstadosM1 = Integer.parseInt(tTamM1.getText());
 			numEstadosM2 = Integer.parseInt(tTamM2.getText());
+			agregarEstimulosRespuestas();
 			if (rbMealy.isSelected()) {
 				tipoMealy();
 			} else {
@@ -134,15 +177,8 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		} else if (comando.equals(resolver)) {
 
 			boolean esMealy = rbMealy.isSelected();
-			if (esMealy) {
-				estimulo1 = panelMealy.getEstimulo1().getText();
-				estimulo2 = panelMealy.getEstimulo2().getText();
-			} else {
-
-				estimulo1 = panelMoore.getEstimulo1().getText();
-				estimulo2 = panelMoore.getEstimulo2().getText();
-			}
-			controlMaquina = new ControlMaquina(esMealy, estimulo1, estimulo2);
+		
+			controlMaquina = new ControlMaquina(esMealy,estimulos,respuestas);
 
 			controlMaquina.crearMaquina1(estadosM1, respM1, SigEstadoM1);
 			controlMaquina.crearMaquina2(estadosM2, respM2, SigEstadoM2);
@@ -167,7 +203,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		if (panelMoore != null)
 			remove(panelMoore);
 
-		panelMealy = new PanelMealy(numEstadosM1, numEstadosM2);
+		panelMealy = new PanelMealy(numEstadosM1, numEstadosM2,estimulos.size(),respuestas.size());
 		add(panelMealy, BorderLayout.CENTER);
 		estadosM1 = panelMealy.getEstadosM1();
 		respM1 = panelMealy.getRespM1();
@@ -186,7 +222,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		if (panelMealy != null)
 			remove(panelMealy);
 
-		panelMoore = new PanelMoore(numEstadosM1, numEstadosM2);
+		panelMoore = new PanelMoore(numEstadosM1, numEstadosM2,estimulos.size(),respuestas.size());
 		add(panelMoore, BorderLayout.CENTER);
 		estadosM1 = panelMoore.getEstadosM1();
 		respM1 = panelMoore.getRespM1();

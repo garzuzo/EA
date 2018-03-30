@@ -22,7 +22,9 @@ public class PanelMoore extends JPanel {
 	private JTextField estimulo1;
 
 	private JTextField estimulo2;
-
+	private int numEstims;
+	private int numResps;
+	
 	public JTextField getEstimulo1() {
 		return estimulo1;
 	}
@@ -57,7 +59,7 @@ public class PanelMoore extends JPanel {
 
 	int tamField = 2;
 
-	public PanelMoore(int tamM1, int tamM2) {
+	public PanelMoore(int tamM1, int tamM2,int numEstims,int numResps) {
 
 		int numRows = tamM1 + tamM2 + 2;
 
@@ -67,6 +69,9 @@ public class PanelMoore extends JPanel {
 		estadosM2 = new ArrayList<JTextField>();
 		respM2 = new ArrayList<JTextField>();
 		SigEstadoM2 = new ArrayList<JTextField>();
+		this.numEstims=numEstims;
+		this.numResps=numResps;
+		
 		setLayout(new BorderLayout());
 
 		generateFields(tamM1, tamM2);
@@ -94,13 +99,14 @@ public class PanelMoore extends JPanel {
 		JLabel lEstado = new JLabel("E");
 		allM1.add(lEstado);
 
-		estimulo1= new JTextField(tamField);
-		estimulo1.setToolTipText("Agregar estimulo");
-		allM1.add(estimulo1);
-
-		estimulo2= new JTextField(tamField);
-		estimulo2.setToolTipText("Agregar estimulo");
-		allM1.add(estimulo2);
+		
+		//agrego el numero de estimulos que se indicaron en el alfabeto
+		for (int i = 0; i < numEstims; i++) {
+			JTextField estimulo1= new JTextField(tamField);
+			estimulo1.setToolTipText("Agregar estimulo");
+			allM1.add(estimulo1);
+		}
+	
 
 		allM1.add(new JLabel("R"));
 
@@ -109,14 +115,12 @@ public class PanelMoore extends JPanel {
 			estadosM1.add(estadoAct);
 			allM1.add(estadoAct);
 
-			JTextField SigEstadoM11 = new JTextField(tamField);
-			SigEstadoM1.add(SigEstadoM11);
-			allM1.add(SigEstadoM11);
-
-			JTextField SigEstadoM12 = new JTextField(tamField);
-			SigEstadoM1.add(SigEstadoM12);
-			allM1.add(SigEstadoM12);
-
+			//agrego los estados siguientes del estado actual, que son en total el numero de estimulos
+			for (int j = 0; j < numEstims; j++) {		
+				JTextField SigEstadoM11 = new JTextField(tamField);
+				SigEstadoM1.add(SigEstadoM11);
+				allM1.add(SigEstadoM11);
+				}
 			JTextField estimuloAct = new JTextField(tamField);
 			respM1.add(estimuloAct);
 			allM1.add(estimuloAct);
@@ -137,13 +141,13 @@ public class PanelMoore extends JPanel {
 		JLabel lEstado2 = new JLabel("E");
 		allM2.add(lEstado2);
 
+		//agrego el numero de estimulos que se indicaron en el alfabeto
+		for (int i = 0; i < numEstims; i++) {
 		JTextField lStim12 = new JTextField(tamField);
 		lStim12.setToolTipText("Agregar estimulo");
 		allM2.add(lStim12);
-
-		JTextField lStim22 = new JTextField(tamField);
-		lStim22.setToolTipText("Agregar estimulo");
-		allM2.add(lStim22);
+		}
+		
 		allM2.add(new JLabel("R"));
 		panelM2.add(allM2, BorderLayout.CENTER);
 
@@ -153,14 +157,12 @@ public class PanelMoore extends JPanel {
 			estadosM2.add(estadoAct);
 			allM2.add(estadoAct);
 
+			for (int j = 0; j < numEstims; j++) {		
 			JTextField SigEstadoM11 = new JTextField(tamField);
 			SigEstadoM2.add(SigEstadoM11);
 			allM2.add(SigEstadoM11);
-
-			JTextField SigEstadoM12 = new JTextField(tamField);
-			SigEstadoM2.add(SigEstadoM12);
-			allM2.add(SigEstadoM12);
-
+			}
+			
 			JTextField estimuloAct = new JTextField(tamField);
 			respM2.add(estimuloAct);
 			allM2.add(estimuloAct);

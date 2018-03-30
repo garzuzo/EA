@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+
 /**
  * 
  * @author garzuzo
@@ -14,8 +15,6 @@ import javax.swing.JTextField;
  */
 public class ControlMaquina {
 
-	
-	
 	boolean tipoMealy;
 	/**
 	 * Almacenamiento de estados mealy como suma de ambas maquinas m1 y m2
@@ -31,15 +30,17 @@ public class ControlMaquina {
 	HashSet<String> estadosM1;
 	HashSet<String> estadosM2;
 
-	
 	String estimulo1;
 	String estimulo2;
-	
+
 	String estadoInicialM1;
 	String estadoInicialM2;
 
 	// RESPUESTAS DE LOS AUTOMATAS
-	HashSet<String> respuestas;
+	private HashSet<String> respuestas;
+	private HashSet<String> estimulos;
+	private int numRespuestas;
+	private int numEstimulos;
 
 	/**
 	 * 
@@ -50,7 +51,8 @@ public class ControlMaquina {
 	 * @param estimulo1
 	 * @param estimulo2
 	 */
-	public ControlMaquina(boolean tipoMealy, String estimulo1, String estimulo2) {
+	public ControlMaquina(boolean tipoMealy, HashSet<String> estimulos,
+			HashSet<String> respuestas) {
 		this.tipoMealy = tipoMealy;
 		this.estimulo1 = estimulo1;
 		this.estimulo2 = estimulo2;
@@ -58,7 +60,10 @@ public class ControlMaquina {
 		estadosM2 = new HashSet<String>();
 		hmEstadosMealy = new HashMap<String, EstadoMealy>();
 		hmEstadosMoore = new HashMap<String, EstadoMoore>();
-		respuestas = new HashSet<String>();
+		this.respuestas = respuestas;
+		numRespuestas = respuestas.size();
+		this.estimulos = estimulos;
+		numEstimulos = estimulos.size();
 	}
 
 	ArrayList<HashSet<String>> pAnterior;
@@ -89,44 +94,43 @@ public class ControlMaquina {
 	 * @return true si m1 y m2 son equivalentes
 	 */
 	public boolean automatasEquivalentes() {
-
-		Iterator<String> it = respuestas.iterator();
-		String resp1 = it.next();
-		String resp2 = it.next();
-
 		if (tipoMealy) {
 
 			pAnterior = new ArrayList<HashSet<String>>();
-			HashSet<String> hsEstim11 = new HashSet<String>();
-			HashSet<String> hsEstim12 = new HashSet<String>();
-			HashSet<String> hsEstim21 = new HashSet<String>();
-			HashSet<String> hsEstim22 = new HashSet<String>();
+			HashMap<String,ArrayList<String>> combinacionesMealy=new HashMap<String,ArrayList<String>>();
 
 			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
 			for (String key : hmEstadosMealy.keySet()) {
 
 				EstadoMealy act = hmEstadosMealy.get(key);
 
-				if (act.respuesta1.equals(resp1) && act.respuesta2.equals(resp1)) {
-					hsEstim11.add(key);
-				} else if (act.respuesta1.equals(resp1) && act.respuesta2.equals(resp2)) {
-					hsEstim12.add(key);
-				} else if (act.respuesta1.equals(resp2) && act.respuesta2.equals(resp1)) {
-					hsEstim21.add(key);
-				} else {
-					hsEstim22.add(key);
-
+				String combinacionAct=act.combinacionMealy();
+			
+				
+				if(combinacionesMealy.containsKey(combinacionAct)){
+					combinacionesMealy.get(combinacionAct).add(act.estado);
+				}else {
+					
+					ArrayList<String> temp=new ArrayList<String>();
+					temp.add(act.estado);
+					combinacionesMealy.put(combinacionAct,temp);
 				}
-
+				}
+				
+				for(String k:combinacionesMealy.keySet()) {
+					
+					HashSet<String> hsResp=new HashSet<String>();
+					ArrayList<String> estadosActResp=combinacionesMealy.get(k);
+					for (int i = 0; i < estadosActResp.size(); i++) {
+						hsResp.add(estadosActResp.get(i));
+					}
+					if(!hsResp.isEmpty())
+					pAnterior.add(hsResp);
+					
+				
 			}
-			if (!hsEstim11.isEmpty())
-				pAnterior.add(hsEstim11);
-			if (!hsEstim12.isEmpty())
-				pAnterior.add(hsEstim12);
-			if (!hsEstim21.isEmpty())
-				pAnterior.add(hsEstim21);
-			if (!hsEstim22.isEmpty())
-				pAnterior.add(hsEstim22);
+			
+
 
 			// clone pActual al empezar p1
 			pActual = new ArrayList<HashSet<String>>();
@@ -149,25 +153,26 @@ public class ControlMaquina {
 					if (itConjAct.hasNext()) {
 						String firstElement = itConjAct.next();
 						EstadoMealy e1 = hmEstadosMealy.get(firstElement);
-						String e1Sig1 = e1.sigEstado1.estado;
-						String e1Sig2 = e1.sigEstado2.estado;
+						
+						ArrayList<EstadoMealy> e1Sig1 = e1.sigEstados;
+						
 						while (itConjAct.hasNext()) {
 
 							EstadoMealy e2 = hmEstadosMealy.get(itConjAct.next());
 							if (!e2.estado.equals(firstElement)) {
-								String e2Sig1 = e2.sigEstado1.estado;
-								String e2Sig2 = e2.sigEstado2.estado;
+								ArrayList<EstadoMealy> e2Sig1 = e2.sigEstados;
+								
 
 								boolean noCumple = false;
 								for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
-									if (pAnterior.get(j).contains(e1Sig1))
-										if (!pAnterior.get(j).contains(e2Sig1))
-											noCumple = true;
-
-									if (pAnterior.get(j).contains(e1Sig2))
-										if (!pAnterior.get(j).contains(e2Sig2))
-											noCumple = true;
+									for (int k = 0; k < e1Sig1.size(); k++) {
+										
+										if(pAnterior.get(j).contains(e1Sig1.get(k)))
+											if(!pAnterior.get(j).contains(e2Sig1.get(k)))
+												noCumple=true;
+									}
+									
 								}
 
 								// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
@@ -240,23 +245,40 @@ public class ControlMaquina {
 			HashSet<String> hsEstim1 = new HashSet<String>();
 			HashSet<String> hsEstim2 = new HashSet<String>();
 
+			// a la respuesta le asigna una posicion
+			HashMap<String, Integer> respPos = new HashMap<String, Integer>();
+			int cont = 0;
+			for (String k : respuestas) {
+				respPos.put(k, cont);
+				cont++;
+			}
+
+			ArrayList<ArrayList<String>> temp = new ArrayList<ArrayList<String>>();
+
+			// agrego subconjuntos, en total el numero de respuestas
+			for (int i = 0; i < cont; i++) {
+				temp.add(new ArrayList<String>());
+			}
 			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
 			for (String key : hmEstadosMoore.keySet()) {
 
 				EstadoMoore act = hmEstadosMoore.get(key);
-				if (act.respuesta.equals(resp1)) {
+				int pos = respPos.get(act.respuesta);
+				temp.get(pos).add(act.estado);
 
-					hsEstim1.add(key);
-				} else {
-					hsEstim2.add(key);
+			}
+			for (int i = 0; i < temp.size(); i++) {
+
+				ArrayList<String> act = temp.get(i);
+				HashSet<String> hsAct = new HashSet<String>();
+				for (int j = 0; j < act.size(); j++) {
+					hsAct.add(act.get(j));
 				}
+				// agrego solo los conjuntos que no estan vacios a p1
+				if (!hsAct.isEmpty())
+					pAnterior.add(hsAct);
 			}
 
-			// agrego solo los conjuntos que no estan vacios a p1
-			if (!hsEstim1.isEmpty())
-				pAnterior.add(hsEstim1);
-			if (!hsEstim2.isEmpty())
-				pAnterior.add(hsEstim2);
 			// clone pActual al empezar p1
 			pActual = new ArrayList<HashSet<String>>();
 			for (int i = 0; i < pAnterior.size(); i++) {
@@ -268,7 +290,6 @@ public class ControlMaquina {
 			}
 
 			while (true) {
-
 				for (int i = 0; i < pActual.size(); i++) {
 					HashSet<String> act = new HashSet<String>();
 					pActual.add(act);
@@ -277,35 +298,33 @@ public class ControlMaquina {
 					if (itConjAct.hasNext()) {
 						String firstElement = itConjAct.next();
 						EstadoMoore e1 = hmEstadosMoore.get(firstElement);
-						String e1Sig1 = e1.sigEstado1.estado;
-						String e1Sig2 = e1.sigEstado2.estado;
+						ArrayList<EstadoMoore> e1Sig1 = e1.sigEstados;
+
 						while (itConjAct.hasNext()) {
 
 							EstadoMoore e2 = hmEstadosMoore.get(itConjAct.next());
 							if (!e2.estado.equals(firstElement)) {
-								String e2Sig1 = e2.sigEstado1.estado;
-								String e2Sig2 = e2.sigEstado2.estado;
+								ArrayList<EstadoMoore> e2Sig1 = e2.sigEstados;
 
 								boolean noCumple = false;
+
+								// verifico que cada estado siguiente de los estados que se estan
+								// comparando esten en el mismo subconjunto
 								for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
-									if (pAnterior.get(j).contains(e1Sig1))
-										if (!pAnterior.get(j).contains(e2Sig1))
-											noCumple = true;
-
-									if (pAnterior.get(j).contains(e1Sig2))
-										if (!pAnterior.get(j).contains(e2Sig2))
-											noCumple = true;
+									for (int k = 0; k < e1Sig1.size(); k++) {
+										if (pAnterior.get(j).contains(e1Sig1.get(k))) {
+											if (!pAnterior.get(j).contains(e2Sig1.get(k))) {
+												noCumple = true;
+											}
+										}
+									}
 								}
-
 								// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
 								if (noCumple) {
-
 									act.add(e2.estado);
 									pActual.get(i).remove(e2.estado);
-
 									itConjAct = pActual.get(i).iterator();
-
 								}
 							}
 						}
@@ -376,8 +395,12 @@ public class ControlMaquina {
 			for (String key : hmEstadosMoore.keySet()) {
 
 				EstadoMoore act = hmEstadosMoore.get(key);
-				String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " "
-						+ act.respuesta;
+				String msg = act.estado + " ";
+				for (int i = 0; i < act.sigEstados.size(); i++) {
+					msg += act.sigEstados.get(i).estado+" ";
+				}
+				msg += act.respuesta;
+
 				System.out.println(msg);
 
 			}
@@ -385,8 +408,11 @@ public class ControlMaquina {
 			for (String key : hmEstadosMealy.keySet()) {
 
 				EstadoMealy act = hmEstadosMealy.get(key);
-				String msg = act.estado + " " + act.sigEstado1.estado + " " + act.sigEstado2.estado + " "
-						+ act.respuesta1 + " " + act.respuesta2;
+				String msg = act.estado + " ";
+				
+				for (int i = 0; i < act.sigEstados.size(); i++) {
+					msg+=act.sigEstados.get(i)+" "+act.listRespuestas.get(i)+" ";
+				}
 				System.out.println(msg);
 			}
 
@@ -445,39 +471,39 @@ public class ControlMaquina {
 		// }
 
 		if (tipoMealy) {
-			for (int i = 0, j = 0; i < respM1.size(); i += 2, j++) {
+			for (int i = 0, j = 0; i < respM1.size(); i += numEstimulos, j++) {
 
-				String resp1 = respM1.get(i).getText();
-				String resp2 = respM1.get(i + 1).getText();
+				ArrayList<String> estimAct = new ArrayList<String>();
+				// respuestas del estado actual
+				ArrayList<String> respAct = new ArrayList<String>();
 
-				String sgnte1 = SigEstadoM1.get(i).getText();
-				EstadoMealy next1 = null;
-				if (hmEstadosMealy.containsKey(sgnte1)) {
-					next1 = hmEstadosMealy.get(sgnte1);
-				} else {
-					next1 = new EstadoMealy(sgnte1);
-					hmEstadosMealy.put(sgnte1, next1);
+				for (int k = i; k < i + numEstimulos; k++) {
+					String sgnte = SigEstadoM1.get(k).getText();
+					estimAct.add(sgnte);
+					String resp = respM1.get(k).getText();
+					respAct.add(resp);
 				}
-
-				String sgnte2 = SigEstadoM1.get(i + 1).getText();
-				EstadoMealy next2 = null;
-				if (hmEstadosMealy.containsKey(sgnte2)) {
-					next2 = hmEstadosMealy.get(sgnte2);
-				} else {
-					next2 = new EstadoMealy(sgnte2);
-					hmEstadosMealy.put(sgnte2, next2);
+				ArrayList<EstadoMealy> estadosSgntes = new ArrayList<EstadoMealy>();
+				for (int k = 0; k < numEstimulos; k++) {
+					String sgnte1 = estimAct.get(k);
+					EstadoMealy next1 = null;
+					if (hmEstadosMealy.containsKey(sgnte1)) {
+						next1 = hmEstadosMealy.get(sgnte1);
+					} else {
+						next1 = new EstadoMealy(sgnte1);
+						hmEstadosMealy.put(sgnte1, next1);
+					}
+					estadosSgntes.add(next1);
 				}
 
 				String nomEstado = statesM1.get(j).getText();
 				estadosM1.add(nomEstado);
+
 				if (hmEstadosMealy.containsKey(nomEstado)) {
 					EstadoMealy eMAct = hmEstadosMealy.get(nomEstado);
-					eMAct.estimulo1 = estimulo1;
-					eMAct.estimulo2 = estimulo2;
-					eMAct.respuesta1 = resp1;
-					eMAct.respuesta2 = resp2;
-					eMAct.sigEstado1 = next1;
-					eMAct.sigEstado2 = next2;
+
+					eMAct.listRespuestas = respAct;
+					eMAct.sigEstados = estadosSgntes;
 
 					if (i == 0) {
 						eMAct.alcanzable = true;
@@ -485,88 +511,91 @@ public class ControlMaquina {
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 
 					}
 
 				} else {
-					EstadoMealy eMAct = new EstadoMealy(nomEstado, estimulo1, next1, resp1, estimulo2, next2, resp2);
+					EstadoMealy eMAct = new EstadoMealy(nomEstado, estadosSgntes, respAct);
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM1 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 
 					}
 
 					hmEstadosMealy.put(nomEstado, eMAct);
 				}
-				respuestas.add(resp1);
-				respuestas.add(resp2);
+
 			}
 
 		} else {
 
-			for (int i = 0, j = 0; j < statesM1.size(); i += 2, j++) {
+			for (int i = 0, j = 0; j < statesM1.size(); i += numEstimulos, j++) {
 				String nomEstado = statesM1.get(j).getText();
 				estadosM1.add(nomEstado);
-				String sgnte1 = SigEstadoM1.get(i).getText();
-				EstadoMoore next1 = null;
-				if (hmEstadosMoore.containsKey(sgnte1)) {
-					next1 = hmEstadosMoore.get(sgnte1);
-				} else {
-					next1 = new EstadoMoore(sgnte1);
-					hmEstadosMoore.put(sgnte1, next1);
+				ArrayList<String> estimAct = new ArrayList<String>();
+				for (int k = i; k < i + numEstimulos; k++) {
+					String sgnte = SigEstadoM1.get(k).getText();
+					estimAct.add(sgnte);
 				}
 
-				String sgnte2 = SigEstadoM1.get(i + 1).getText();
-				EstadoMoore next2 = null;
-				if (hmEstadosMoore.containsKey(sgnte2)) {
-					next2 = hmEstadosMoore.get(sgnte2);
-				} else {
-					next2 = new EstadoMoore(sgnte2);
-					hmEstadosMoore.put(sgnte2, next2);
+				ArrayList<EstadoMoore> estadosSgntes = new ArrayList<EstadoMoore>();
+
+				for (int k = 0; k < estimAct.size(); k++) {
+
+					String sgnte1 = estimAct.get(k);
+					EstadoMoore next1 = null;
+					if (hmEstadosMoore.containsKey(sgnte1)) {
+						next1 = hmEstadosMoore.get(sgnte1);
+					} else {
+						next1 = new EstadoMoore(sgnte1);
+						hmEstadosMoore.put(sgnte1, next1);
+					}
+					estadosSgntes.add(next1);
 				}
 
 				String resp = respM1.get(j).getText();
 				if (hmEstadosMoore.containsKey(nomEstado)) {
 					EstadoMoore eMAct = hmEstadosMoore.get(nomEstado);
-					eMAct.estimulo1 = estimulo1;
-					eMAct.estimulo2 = estimulo2;
+
 					eMAct.respuesta = resp;
 
-					eMAct.sigEstado1 = next1;
-					eMAct.sigEstado2 = next2;
+					eMAct.sigEstados = estadosSgntes;
+
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM1 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 
 					}
 				} else {
 
-					EstadoMoore eMAct = new EstadoMoore(nomEstado, estimulo1, next1, estimulo2, next2, resp);
+					EstadoMoore eMAct = new EstadoMoore(nomEstado, estadosSgntes, resp);
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM1 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
-
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 					}
 					hmEstadosMoore.put(nomEstado, eMAct);
 				}
-				respuestas.add(resp);
 
 			}
 		}
@@ -589,36 +618,33 @@ public class ControlMaquina {
 		// Cambio nombres de estados con el mismo nombre
 
 		if (tipoMealy) {
-			for (int i = 0, j = 0; i < respM2.size(); i += 2, j++) {
+			for (int i = 0, j = 0; i < respM2.size(); i += numEstimulos, j++) {
+				ArrayList<String> estimAct = new ArrayList<String>();
+				// respuestas del estado actual
+				ArrayList<String> respAct = new ArrayList<String>();
 
-				String resp1 = respM2.get(i).getText();
-				String resp2 = respM2.get(i + 1).getText();
-
-				String sgnte1 = SigEstadoM2.get(i).getText();
-
-				// PASO 1:verifico si tiene el mismo nombre de un estado de M1
-				if (estadosM1.contains(sgnte1))
-					sgnte1 += sgnte1;
-
-				EstadoMealy next1 = null;
-				if (hmEstadosMealy.containsKey(sgnte1)) {
-					next1 = hmEstadosMealy.get(sgnte1);
-				} else {
-					next1 = new EstadoMealy(sgnte1);
-					hmEstadosMealy.put(sgnte1, next1);
+				for (int k = i; k < i + numEstimulos; k++) {
+					String sgnte = SigEstadoM2.get(k).getText();
+					estimAct.add(sgnte);
+					String resp = respM2.get(k).getText();
+					respAct.add(resp);
 				}
+				ArrayList<EstadoMealy> estadosSgntes = new ArrayList<EstadoMealy>();
+				for (int k = 0; k < numEstimulos; k++) {
+					String sgnte1 = estimAct.get(k);
 
-				String sgnte2 = SigEstadoM2.get(i + 1).getText();
-				// PASO 1: verifico si tiene el mismo nombre de un estado de M1
-				if (estadosM1.contains(sgnte2))
-					sgnte2 += sgnte2;
+					// PASO 1:verifico si tiene el mismo nombre de un estado de M1
+					if (estadosM1.contains(sgnte1))
+						sgnte1 += sgnte1;
 
-				EstadoMealy next2 = null;
-				if (hmEstadosMealy.containsKey(sgnte2)) {
-					next2 = hmEstadosMealy.get(sgnte2);
-				} else {
-					next2 = new EstadoMealy(sgnte2);
-					hmEstadosMealy.put(sgnte2, next2);
+					EstadoMealy next1 = null;
+					if (hmEstadosMealy.containsKey(sgnte1)) {
+						next1 = hmEstadosMealy.get(sgnte1);
+					} else {
+						next1 = new EstadoMealy(sgnte1);
+						hmEstadosMealy.put(sgnte1, next1);
+					}
+					estadosSgntes.add(next1);
 				}
 
 				String nomEstado = statesM2.get(j).getText();
@@ -629,102 +655,103 @@ public class ControlMaquina {
 				estadosM2.add(nomEstado);
 				if (hmEstadosMealy.containsKey(nomEstado)) {
 					EstadoMealy eMAct = hmEstadosMealy.get(nomEstado);
-					eMAct.estimulo1 = estimulo1;
-					eMAct.estimulo2 = estimulo2;
-					eMAct.respuesta1 = resp1;
-					eMAct.respuesta2 = resp2;
-					eMAct.sigEstado1 = next1;
-					eMAct.sigEstado2 = next2;
+
+					eMAct.listRespuestas = respAct;
+
+					eMAct.sigEstados = estadosSgntes;
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM2 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 
 					}
 				} else {
-					EstadoMealy eMAct = new EstadoMealy(nomEstado, estimulo1, next1, resp1, estimulo2, next2, resp2);
+					EstadoMealy eMAct = new EstadoMealy(nomEstado, estadosSgntes,respAct);
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM2 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(i).alcanzable = true;
+						}
 
 					}
 					hmEstadosMealy.put(nomEstado, eMAct);
 				}
 			}
 		} else {
-			for (int i = 0, j = 0; i < SigEstadoM2.size(); i += 2, j++) {
+			for (int i = 0, j = 0; i < SigEstadoM2.size(); i += numEstimulos, j++) {
 				String nomEstado = statesM2.get(j).getText();
 				// PASO 1: verifico si tiene el mismo nombre de un estado de M1
 				if (estadosM1.contains(nomEstado))
 					nomEstado += nomEstado;
 
-				String sgnte1 = SigEstadoM2.get(i).getText();
-				// PASO 1: verifico si tiene el mismo nombre de un estado de M1
-				if (estadosM1.contains(sgnte1))
-					sgnte1 += sgnte1;
+				ArrayList<String> estimAct = new ArrayList<String>();
+				for (int k = i; k < i + numEstimulos; k++) {
+					String sgnte = SigEstadoM2.get(k).getText();
+
+					// PASO 1: verifico si tiene el mismo nombre de un estado de M1
+					if (estadosM1.contains(sgnte))
+						sgnte += sgnte;
+
+					estimAct.add(sgnte);
+				}
+
+				ArrayList<EstadoMoore> estadosSgntes = new ArrayList<EstadoMoore>();
+
+				for (int k = 0; k < estimAct.size(); k++) {
+
+					String sgnte1 = estimAct.get(k);
+					EstadoMoore next1 = null;
+					if (hmEstadosMoore.containsKey(sgnte1)) {
+						next1 = hmEstadosMoore.get(sgnte1);
+					} else {
+						next1 = new EstadoMoore(sgnte1);
+						hmEstadosMoore.put(sgnte1, next1);
+					}
+					estadosSgntes.add(next1);
+				}
 
 				estadosM2.add(nomEstado);
-				EstadoMoore next1 = null;
-				if (hmEstadosMoore.containsKey(sgnte1)) {
-					next1 = hmEstadosMoore.get(sgnte1);
-				} else {
-					next1 = new EstadoMoore(sgnte1);
-					hmEstadosMoore.put(sgnte1, next1);
-				}
-
-				String sgnte2 = SigEstadoM2.get(i + 1).getText();
-				// PASO 1: verifico si tiene el mismo nombre de un estado de M1
-				if (estadosM1.contains(sgnte2))
-					sgnte2 += sgnte2;
-
-				EstadoMoore next2 = null;
-				if (hmEstadosMoore.containsKey(sgnte2)) {
-					next2 = hmEstadosMoore.get(sgnte2);
-				} else {
-					next2 = new EstadoMoore(sgnte2);
-					hmEstadosMoore.put(sgnte2, next2);
-				}
 
 				String resp = respM2.get(j).getText();
 
 				if (hmEstadosMoore.containsKey(nomEstado)) {
 					EstadoMoore eMAct = hmEstadosMoore.get(nomEstado);
-					eMAct.estimulo1 = estimulo1;
-					eMAct.estimulo2 = estimulo2;
+
 					eMAct.respuesta = resp;
 
-					eMAct.sigEstado1 = next1;
-					eMAct.sigEstado2 = next2;
+					eMAct.sigEstados = estadosSgntes;
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM2 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 
 					}
 				} else {
 
-					EstadoMoore eMAct = new EstadoMoore(nomEstado, estimulo1, next1, estimulo2, next2, resp);
+					EstadoMoore eMAct = new EstadoMoore(nomEstado, estadosSgntes, resp);
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM2 = nomEstado;
 					}
 					// si el estado actual es alcanzable, los que conecta son alcanzables
 					if (eMAct.alcanzable) {
-						next1.alcanzable = true;
-						next2.alcanzable = true;
+						for (int k = 0; k < eMAct.sigEstados.size(); k++) {
+							eMAct.sigEstados.get(k).alcanzable = true;
+						}
 
 					}
 					hmEstadosMoore.put(nomEstado, eMAct);
