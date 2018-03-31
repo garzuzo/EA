@@ -14,7 +14,7 @@ public class EstadoMealy {
 	public EstadoMealy(String estado,ArrayList<EstadoMealy>sigEstado,ArrayList<String>listRespuestas) {
 		this.estado=estado;
 		this.listRespuestas=listRespuestas;
-		
+		this.sigEstados=sigEstado;
 	}
 	
 	public EstadoMealy(String estado) {

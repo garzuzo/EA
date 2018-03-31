@@ -10,6 +10,7 @@ public class EstadoMoore {
 
 		this.estado = estado;
 		this.respuesta = respuesta;
+		this.sigEstados = sigEstados;
 	}
 
 	ArrayList<EstadoMoore> sigEstados;
