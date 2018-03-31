@@ -30,8 +30,6 @@ public class ControlMaquina {
 	HashSet<String> estadosM1;
 	HashSet<String> estadosM2;
 
-	
-
 	String estadoInicialM1;
 	String estadoInicialM2;
 
@@ -50,10 +48,9 @@ public class ControlMaquina {
 	 * @param estimulo1
 	 * @param estimulo2
 	 */
-	public ControlMaquina(boolean tipoMealy, HashSet<String> estimulos,
-			HashSet<String> respuestas) {
+	public ControlMaquina(boolean tipoMealy, HashSet<String> estimulos, HashSet<String> respuestas) {
 		this.tipoMealy = tipoMealy;
-		
+
 		estadosM1 = new HashSet<String>();
 		estadosM2 = new HashSet<String>();
 		hmEstadosMealy = new HashMap<String, EstadoMealy>();
@@ -95,40 +92,36 @@ public class ControlMaquina {
 		if (tipoMealy) {
 
 			pAnterior = new ArrayList<HashSet<String>>();
-			HashMap<String,ArrayList<String>> combinacionesMealy=new HashMap<String,ArrayList<String>>();
+			HashMap<String, ArrayList<String>> combinacionesMealy = new HashMap<String, ArrayList<String>>();
 
 			// PASO 4a, particion inicial, se agrupan los que tienen la misma salida
 			for (String key : hmEstadosMealy.keySet()) {
 
 				EstadoMealy act = hmEstadosMealy.get(key);
 
-				String combinacionAct=act.combinacionMealy();
-			
-				
-				if(combinacionesMealy.containsKey(combinacionAct)){
-					combinacionesMealy.get(combinacionAct).add(act.estado);
-				}else {
-					
-					ArrayList<String> temp=new ArrayList<String>();
-					temp.add(act.estado);
-					combinacionesMealy.put(combinacionAct,temp);
-				}
-				}
-				
-				for(String k:combinacionesMealy.keySet()) {
-					
-					HashSet<String> hsResp=new HashSet<String>();
-					ArrayList<String> estadosActResp=combinacionesMealy.get(k);
-					for (int i = 0; i < estadosActResp.size(); i++) {
-						hsResp.add(estadosActResp.get(i));
-					}
-					if(!hsResp.isEmpty())
-					pAnterior.add(hsResp);
-					
-				
-			}
-			
+				String combinacionAct = act.combinacionMealy();
 
+				if (combinacionesMealy.containsKey(combinacionAct)) {
+					combinacionesMealy.get(combinacionAct).add(act.estado);
+				} else {
+
+					ArrayList<String> temp = new ArrayList<String>();
+					temp.add(act.estado);
+					combinacionesMealy.put(combinacionAct, temp);
+				}
+			}
+
+			for (String k : combinacionesMealy.keySet()) {
+
+				HashSet<String> hsResp = new HashSet<String>();
+				ArrayList<String> estadosActResp = combinacionesMealy.get(k);
+				for (int i = 0; i < estadosActResp.size(); i++) {
+					hsResp.add(estadosActResp.get(i));
+				}
+				if (!hsResp.isEmpty())
+					pAnterior.add(hsResp);
+
+			}
 
 			// clone pActual al empezar p1
 			pActual = new ArrayList<HashSet<String>>();
@@ -151,26 +144,26 @@ public class ControlMaquina {
 					if (itConjAct.hasNext()) {
 						String firstElement = itConjAct.next();
 						EstadoMealy e1 = hmEstadosMealy.get(firstElement);
-						
+
 						ArrayList<EstadoMealy> e1Sig1 = e1.sigEstados;
-						
+
 						while (itConjAct.hasNext()) {
 
 							EstadoMealy e2 = hmEstadosMealy.get(itConjAct.next());
 							if (!e2.estado.equals(firstElement)) {
 								ArrayList<EstadoMealy> e2Sig1 = e2.sigEstados;
-								
 
 								boolean noCumple = false;
 								for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
 									for (int k = 0; k < e1Sig1.size(); k++) {
-										
-										if(pAnterior.get(j).contains(e1Sig1.get(k)))
-											if(!pAnterior.get(j).contains(e2Sig1.get(k)))
-												noCumple=true;
+
+										if (pAnterior.get(j).contains(e1Sig1.get(k).estado))
+											if (!pAnterior.get(j).contains(e2Sig1.get(k).estado))
+												noCumple = true;
+
 									}
-									
+
 								}
 
 								// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
@@ -311,11 +304,12 @@ public class ControlMaquina {
 								for (int j = 0; j < pAnterior.size() && !noCumple; j++) {
 
 									for (int k = 0; k < e1Sig1.size(); k++) {
-										if (pAnterior.get(j).contains(e1Sig1.get(k))) {
-											if (!pAnterior.get(j).contains(e2Sig1.get(k))) {
+										if (pAnterior.get(j).contains(e1Sig1.get(k).estado)) {
+											if (!pAnterior.get(j).contains(e2Sig1.get(k).estado)) {
 												noCumple = true;
 											}
 										}
+
 									}
 								}
 								// si de ambos no estan en el mismo subconjunto, se separa del conjunto actual
@@ -395,7 +389,7 @@ public class ControlMaquina {
 				EstadoMoore act = hmEstadosMoore.get(key);
 				String msg = act.estado + " ";
 				for (int i = 0; i < act.sigEstados.size(); i++) {
-					msg += act.sigEstados.get(i).estado+" ";
+					msg += act.sigEstados.get(i).estado + " ";
 				}
 				msg += act.respuesta;
 
@@ -407,9 +401,9 @@ public class ControlMaquina {
 
 				EstadoMealy act = hmEstadosMealy.get(key);
 				String msg = act.estado + " ";
-				
+
 				for (int i = 0; i < act.sigEstados.size(); i++) {
-					msg+=act.sigEstados.get(i)+" "+act.listRespuestas.get(i)+" ";
+					msg += act.sigEstados.get(i) + " " + act.listRespuestas.get(i) + " ";
 				}
 				System.out.println(msg);
 			}
@@ -480,7 +474,7 @@ public class ControlMaquina {
 					estimAct.add(sgnte);
 					String resp = respM1.get(k).getText();
 					respAct.add(resp);
-					
+
 				}
 				ArrayList<EstadoMealy> estadosSgntes = new ArrayList<EstadoMealy>();
 				for (int k = 0; k < numEstimulos; k++) {
@@ -670,7 +664,7 @@ public class ControlMaquina {
 
 					}
 				} else {
-					EstadoMealy eMAct = new EstadoMealy(nomEstado, estadosSgntes,respAct);
+					EstadoMealy eMAct = new EstadoMealy(nomEstado, estadosSgntes, respAct);
 					if (i == 0) {
 						eMAct.alcanzable = true;
 						estadoInicialM2 = nomEstado;
