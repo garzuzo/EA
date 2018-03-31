@@ -1,4 +1,5 @@
 Autor: Johnatan Garzon M.
+Escrito en Java.
 Instrucciones de uso:
 1) Selecciona el tipo de maquina de estado (Mealy o Moore)
 2.a) Indica el numero de estados de M1.
