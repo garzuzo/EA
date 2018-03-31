@@ -178,6 +178,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 
 			boolean esMealy = rbMealy.isSelected();
 		
+			if(verificarRespuestas()) {
 			controlMaquina = new ControlMaquina(esMealy,estimulos,respuestas);
 
 			controlMaquina.crearMaquina1(estadosM1, respM1, SigEstadoM1);
@@ -189,10 +190,32 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 			String conjuntoFinal = controlMaquina.conjuntoFinal();
 			JOptionPane.showMessageDialog(null,
 					equivalentes ? msg + "equivalentes\n" + conjuntoFinal : msg + "NO equivalentes\n" + conjuntoFinal);
-
+			}else
+				JOptionPane.showMessageDialog(null, "Verifique que las respuestas pertenezcan al alfabeto");
 		}
 
 	}
+	/**
+	 * 
+	 * verifica que las respuestas pertenezcan al alfabeto
+	 * @return true si es correcto
+	 */
+	public boolean verificarRespuestas() {
+		
+		
+		for (int i = 0; i < respM1.size(); i++) {
+			
+			if(!respuestas.contains(respM1.get(i).getText()))
+					return false;
+			if(!respuestas.contains(respM2.get(i).getText()))
+				return false;
+		}
+		return true;
+		
+	}
+	
+	
+
 /**
  * Al seleccionar el tipo Mealy y undir el boton Aceptar
  * se desplegara la tabla para ingresar los datos de M1 y de M2

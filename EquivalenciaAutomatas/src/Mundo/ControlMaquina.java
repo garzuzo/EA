@@ -30,8 +30,7 @@ public class ControlMaquina {
 	HashSet<String> estadosM1;
 	HashSet<String> estadosM2;
 
-	String estimulo1;
-	String estimulo2;
+	
 
 	String estadoInicialM1;
 	String estadoInicialM2;
@@ -54,8 +53,7 @@ public class ControlMaquina {
 	public ControlMaquina(boolean tipoMealy, HashSet<String> estimulos,
 			HashSet<String> respuestas) {
 		this.tipoMealy = tipoMealy;
-		this.estimulo1 = estimulo1;
-		this.estimulo2 = estimulo2;
+		
 		estadosM1 = new HashSet<String>();
 		estadosM2 = new HashSet<String>();
 		hmEstadosMealy = new HashMap<String, EstadoMealy>();
@@ -482,6 +480,7 @@ public class ControlMaquina {
 					estimAct.add(sgnte);
 					String resp = respM1.get(k).getText();
 					respAct.add(resp);
+					
 				}
 				ArrayList<EstadoMealy> estadosSgntes = new ArrayList<EstadoMealy>();
 				for (int k = 0; k < numEstimulos; k++) {
