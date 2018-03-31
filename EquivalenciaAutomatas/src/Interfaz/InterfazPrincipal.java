@@ -207,6 +207,8 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 			
 			if(!respuestas.contains(respM1.get(i).getText()))
 					return false;
+		}
+		for (int i = 0; i < respM2.size(); i++) {
 			if(!respuestas.contains(respM2.get(i).getText()))
 				return false;
 		}

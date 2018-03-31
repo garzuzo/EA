@@ -4,8 +4,8 @@ Instrucciones de uso:
 1) Selecciona el tipo de maquina de estado (Mealy o Moore)
 2.a) Indica el numero de estados de M1.
 2.b) Indica el numero de estados de M2.
-2.c) indica el alfabeto de estimulos.
-2.d) Indica el alfabeto de respuestas.
+2.c) indica el alfabeto de estimulos, ej:a,b,c,...,n  / ej:0,1,2,3,...,n 
+2.d) Indica el alfabeto de respuestas, ej:a,b,c,...,n / ej:0,1,2,3,...,n
 3) Click en Aceptar,
 Se desplegaran las tablas de estado para M1 y M2
 y se llenaran como normalmente se haria con una Maquina tipo Mealy o Moore.
