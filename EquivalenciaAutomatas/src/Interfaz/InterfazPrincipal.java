@@ -36,23 +36,23 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 	public static final String selectTipoM = "tipoM";
 	public static final String resolver = "res";
 	public static final String aceptar = "aceptar";
-	JRadioButton rbMealy;
-	JRadioButton rbMoore;
+	private JRadioButton rbMealy;
+	private JRadioButton rbMoore;
 
-	PanelMealy panelMealy;
-	PanelMoore panelMoore;
+	private PanelMealy panelMealy;
+	private PanelMoore panelMoore;
 
-	JTextField tTamM1;
-	JTextField tTamM2;
-	JButton bAceptar;
-	JButton bResolver;
+	private JTextField tTamM1;
+	private JTextField tTamM2;
+	private JButton bAceptar;
+	private JButton bResolver;
 
 	
-	HashSet<String> estimulos;
-	HashSet<String> respuestas;
+	private HashSet<String> estimulos;
+	private HashSet<String> respuestas;
 	
-	JTextField tEstimulos;
-	JTextField  tRespuestas;
+	private JTextField tEstimulos;
+	private JTextField  tRespuestas;
 	/**
 	 * 
 	 * Constructor del Frame que inicializara los elementos
@@ -162,7 +162,7 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 		String comando = ae.getActionCommand();
 
 		if (comando.equals(aceptar)) {
-
+try {
 			numEstadosM1 = Integer.parseInt(tTamM1.getText());
 			numEstadosM2 = Integer.parseInt(tTamM2.getText());
 			agregarEstimulosRespuestas();
@@ -173,9 +173,11 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 			}
 			this.pack();
 			this.revalidate();
-
+}catch(Exception e) {
+	JOptionPane.showMessageDialog(null, "Verificar informacion ingresada");
+}
 		} else if (comando.equals(resolver)) {
-
+try {
 			boolean esMealy = rbMealy.isSelected();
 		
 			if(verificarRespuestas()) {
@@ -192,7 +194,10 @@ public class InterfazPrincipal extends JFrame implements ActionListener {
 					equivalentes ? msg + "equivalentes\n" + conjuntoFinal : msg + "NO equivalentes\n" + conjuntoFinal);
 			}else
 				JOptionPane.showMessageDialog(null, "Verifique que las respuestas pertenezcan al alfabeto");
-		}
+}catch(Exception e) {
+	JOptionPane.showMessageDialog(null, "Verificar informacion ingresada");
+}
+}
 
 	}
 	/**

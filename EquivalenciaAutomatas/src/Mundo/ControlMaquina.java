@@ -15,22 +15,22 @@ import javax.swing.JTextField;
  */
 public class ControlMaquina {
 
-	boolean tipoMealy;
+	private boolean tipoMealy;
 	/**
 	 * Almacenamiento de estados mealy como suma de ambas maquinas m1 y m2
 	 */
-	HashMap<String, EstadoMealy> hmEstadosMealy;
+	private HashMap<String, EstadoMealy> hmEstadosMealy;
 	/**
 	 * Almacenamiento de estados moore como suma de ambas maquinas m1 y m2
 	 */
-	HashMap<String, EstadoMoore> hmEstadosMoore;
+	private HashMap<String, EstadoMoore> hmEstadosMoore;
 
 	// En el momento de hacer la suma de m1 y m2 sirve para verificar que no se vaya
 	// a repetir nombres
-	HashSet<String> estadosM1;
-	HashSet<String> estadosM2;
+	private HashSet<String> estadosM1;
+	private HashSet<String> estadosM2;
 
-	String estadoInicialM1;
+	private String estadoInicialM1;
 	String estadoInicialM2;
 
 	// RESPUESTAS DE LOS AUTOMATAS
